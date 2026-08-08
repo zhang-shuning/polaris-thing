@@ -13,6 +13,8 @@ VERTICAL_SIZE = 360
 START_GAME_NAME = "Start Game"
 LEVEL_SELECTOR_NAME = "Level\n Selector"
 RETURN_MENU = "BACK TO \nMAIN MENU"
+QUIT_TEXT = "QUIT GAME"
+
 
 #Physics constants
 #Most of these are multiplied by frametime * 60/1000
@@ -27,6 +29,7 @@ JUMP_HORIZONTAL_PART = .05 #Coefficient on increased jump height for horizontal 
 HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
+
 
 
 running = True
@@ -198,6 +201,8 @@ while running:
                     current_screen = ScreenEnum.GAME
                 elif button_pos_dict[LEVEL_SELECTOR_NAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.LEVEL_SELECTOR
+                elif button_pos_dict[QUIT_TEXT].collidepoint(pygame.mouse.get_pos()):
+                    running = False
 
             elif current_screen == ScreenEnum.LEVEL_SELECTOR:
                 if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
@@ -214,9 +219,10 @@ while running:
                                             rect=rect, map = "assets/block1.png"))
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                exit(0)
+                current_screen = ScreenEnum.MAIN_MENU
             if event.key == pygame.K_b:
                 player.in_build = not player.in_build
+
 
     keys = pygame.key.get_pressed()
     #Clears screen
@@ -284,12 +290,14 @@ while running:
             pygame.draw.line(screen, (255,255,255),(0,11*32),(HORIZONTAL_SIZE,11*32))
             #updates the screen
             pygame.display.flip()
+            menu_loaded = False
         case ScreenEnum.MAIN_MENU:
             #Main menu
             if not menu_loaded:
                 pygame.mouse.set_visible(True)
                 make_button(big_text, START_GAME_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
                 make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/10, VERTICAL_SIZE/10))
+                make_button(big_text, QUIT_TEXT, (HORIZONTAL_SIZE - 80, VERTICAL_SIZE - 20))
                 menu_loaded = True
                 level_selector_loaded = False
                 pygame.display.flip()
