@@ -2,13 +2,20 @@ from typing import override
 import pygame
 from pygame.typing import Point
 
+HORIZONTAL_SIZE = 320
+VERTICAL_SIZE = 180
+
 running = True
 pygame.init()
-screen = pygame.display.set_mode((320,180),vsync=1,flags = pygame.FULLSCREEN|pygame.SCALED)
+screen = pygame.display.set_mode((HORIZONTAL_SIZE, VERTICAL_SIZE),vsync=1,flags = pygame.FULLSCREEN|pygame.SCALED)
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
-collider_list:list[pygame.Rect] = []
+
+surface_list:list[ScreenSurface] = []
+collider_list:list[ScreenSurface] = []
+screen_offset:int = 0
+screen_end:int = 0
 
 class ScreenSurface():
     '''A surface that gets drawn onto the screen'''
@@ -42,7 +49,7 @@ class Player(ScreenSurface):
 
     def move(self):
         '''
-        Function for player movement, called every frame the player is active
+        Method for player movement, called every frame the player is active
         '''
         #Try adding X velocity
         self.x_pos += self.x_vel
@@ -69,9 +76,20 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     player.x_vel = 1
-    # drawing
+
+    #Clears screen
     screen.fill((50,50,50))
+    #Player moves
     player.move()
+    #Offset is updated and everything is drawn
+    #Scroll right
+    if player.x_pos - screen_offset > HORIZONTAL_SIZE/2:
+        screen_offset =  
+    #Player is a surface but it's done seperately so that the player does not to be readded
     player.draw()
+    for i in surface_list:
+        i.draw()
+
+
     # updates the screen
     pygame.display.flip()
