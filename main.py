@@ -21,7 +21,7 @@ clock = pygame.time.Clock()
 surface_list:list[ScreenSurface] = []
 collider_list:list[ScreenSurface] = []
 screen_offset:int = 0
-screen_end:int = 0
+screen_end:int = 1000
 
 #Menus
 menu_loaded:bool = False
@@ -69,6 +69,7 @@ class ScreenSurface():
         self.enabled = enabled
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
+        self.rect_list = []
 
     def draw(self):
         '''Draws onto the screen'''
@@ -88,6 +89,8 @@ class ScreenSurface():
                             rect=(self.rect.x - screen_offset, self.rect.y,
                             self.rect.width, self.rect.height),
                             width=1)
+        for rect in self.rect_list:
+            pygame.draw.rect(screen, (0,255,0), rect)
 
 class Player(ScreenSurface):
     '''This would be kinda a general moving class, but the only moving thing is the player'''
@@ -155,8 +158,11 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if current_screen == ScreenEnum.MAIN_MENU:
-                    if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
-                        current_screen = ScreenEnum.GAME
+                if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.GAME
+            if event.button == 1:
+                mouse_pos = pygame.mouse.get_pos()
+                player.rect_list.append((pygame.mouse.get_pos(),(50,50)))
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 exit(0)
