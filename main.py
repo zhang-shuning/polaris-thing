@@ -10,12 +10,13 @@ pygame.mouse.set_cursor(*pygame.cursors.arrow)
 collider_list:list[pygame.Rect] = []
 
 class Player():
-    def __init__(self, surface:pygame.Surface, frect:pygame.FRect) -> None:
+    def __init__(self, surface:pygame.Surface, frect:pygame.FRect, hitbox_enabled=False) -> None:
         self.surface = surface
         self.frect = frect
         self.x_vel = 0
         self.y_vel = 0
         self.enabled = True
+        self.hitbox_enabled = hitbox_enabled
 
     def move(self):
         '''
@@ -36,9 +37,14 @@ class Player():
             self.frect.y = collider_list[y_intersect_index].y
 
     def draw(self):
+        if not self.enabled:
+            return
         screen.blit(source=self.surface, dest=(round(self.frect.x), round(self.frect.y)))
+        #if self.hitbox_enabled:
+            #screen.blit(source=self.surface, dest=(round(self.frect.x), round(self.frect.y)))
 
-#player = Player(pygame.image.load())
+
+player = Player(pygame.image.load("assets/temphole.png"), pygame.FRect((0, 0), (16, 16)))
 
 while running:
     
@@ -46,7 +52,10 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+    player.x_vel = 1
     # drawing
     screen.fill((50,50,50))
+    player.move()
+    player.draw()
     # updates the screen
     pygame.display.flip()
