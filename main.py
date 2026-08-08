@@ -31,13 +31,14 @@ class ScreenSurface():
     A surface that gets drawn onto the screen that gets scrolls off the screen.
     Drawn around a rect, which the hitbox flag shows
     '''
-    def __init__(self, surface:pygame.Surface, rect:pygame.Rect, enabled = True, hitbox_enabled=False) -> None:
+    def __init__(self, surface:pygame.Surface, rect:pygame.Rect, rect_offset = (0, 0), enabled = True, hitbox_enabled=False) -> None:
         self.surface = surface
         self.rect = rect
         self.x_vel = 0
         self.y_vel = 0
         self.enabled = enabled
         self.hitbox_enabled = hitbox_enabled
+        self.rect_offset = rect_offset
 
     def draw(self):
         '''Draws onto the screen'''
@@ -50,7 +51,7 @@ class ScreenSurface():
         if self.rect.x > screen_offset + HORIZONTAL_SIZE:
            return
         screen.blit(source=self.surface,
-                    dest=(self.rect.x - screen_offset, self.rect.y))
+                    dest=(self.rect.x - screen_offset + self.rect_offset[0], self.rect.y + self.rect_offset[1]))
         if self.hitbox_enabled:
             pygame.draw.rect(surface=screen,
                             color=(255, 0, 0), 
@@ -66,20 +67,6 @@ class Player(ScreenSurface):
         self.y_vel = 0
         self.x_pos = 0
         self.y_pos = 0
-
-    @override
-    def draw(self):
-        '''Draws onto the screen'''
-        if not self.enabled:
-            return
-        screen.blit(source=self.surface,
-                    dest=(self.rect.x - screen_offset, self.rect.y))
-        if self.hitbox_enabled:
-            pygame.draw.rect(surface=screen,
-                            color=(255, 0, 0), 
-                            rect=(self.rect.x - screen_offset, self.rect.y,
-                            self.rect.width, self.rect.height),
-                            width=1)
 
     def move(self):
         '''
