@@ -191,7 +191,7 @@ while running:
             if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
                 print("very real jump", player.y_vel)
                 if player.y_vel > 0:
-                    player.y_vel -= 2
+                    player.y_vel -= 2.5
                 else:
                     player.y_vel -= .5*min(delta_time,(delta_time+player.grounded_timer))
             player.x_vel *= delta_time*0.95
