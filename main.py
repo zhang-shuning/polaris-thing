@@ -193,7 +193,7 @@ while running:
                 if player.y_vel > 0:
                     player.y_vel -= 2
                 else:
-                    player.y_vel -= .5*delta_time
+                    player.y_vel -= .5*min(delta_time,(delta_time+player.grounded_timer))
             player.x_vel *= delta_time*0.95
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
