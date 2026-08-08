@@ -8,6 +8,8 @@ from pygame.typing import Point
 HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
+FUZZY_ZERO = 0.001
+GRAVITY = 0.05
 START_GAME_NAME = "Start Game"
 
 running = True
@@ -69,7 +71,6 @@ class ScreenSurface():
         self.enabled = enabled
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
-        self.rect_list = []
 
     def draw(self):
         '''Draws onto the screen'''
@@ -100,6 +101,8 @@ class Player(ScreenSurface):
         self.y_vel = 0
         self.x_pos = rect.x
         self.y_pos = rect.x
+        self.grounded = False
+        self.grounded_timer = 0
 
     def check_x_collisions(self):
         #Check collisions, if collided, set x position to the x
@@ -124,10 +127,13 @@ class Player(ScreenSurface):
             if self.y_vel > 0:
                 self.y_pos = collided_distance - self.rect.height
                 self.rect.y = collided_distance - self.rect.height
+                self.y_vel = 0
+                self.grounded = True
             elif self.y_vel < 0:
                 collided_size = collider_list[y_intersect_index].rect.height
                 self.y_pos = collided_distance + collided_size
                 self.rect.y = collided_distance + collided_size
+                self.y_vel = 0
 
     def move(self):
         '''
@@ -146,8 +152,7 @@ player = Player(surface=pygame.image.load("assets/block1.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
 
 while running:
-    print(clock.get_fps())
-    clock.tick(60)
+    delta_time = clock.tick(60)*3/50
     # event queue
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -176,8 +181,14 @@ while running:
     match current_screen:
         case ScreenEnum.GAME:
             #In game
-            player.x_vel += .01*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
-            player.y_vel += .01*(keys[pygame.K_DOWN] - keys[pygame.K_UP])
+            player.x_vel += delta_time*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            player.y_vel += delta_time*GRAVITY
+            if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
+                print("very real jump", player.y_vel)
+                player.y_vel -= 10
+            player.x_vel *= delta_time*0.95
+            if abs(player.x_vel) < FUZZY_ZERO:
+                player.x_vel = 0
             #Player moves
             player.move()
             #Offset is updated and everything is drawn
