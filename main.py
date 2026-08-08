@@ -48,6 +48,5 @@ while running:
             running = False
     # drawing
     screen.fill((50,50,50))
-
     # updates the screen
     pygame.display.flip()
