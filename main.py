@@ -17,6 +17,7 @@ FAST_FALL_COEFFICIENT = 0.2
 INSTANT_JUMP_VELOCITY = 2.5
 JUMP_HOLD_COEFICIENT = .5
 JUMP_HOLD_TIME = 24/5
+JUMP_HORIZONTAL_PART = .1
 AIR_RESISTANCE_COEFFICIENT = .95
 
 
@@ -197,13 +198,13 @@ while running:
             #In game
             player.x_vel += delta_time*HORIZONTAL_VELOCITY_COEFFICIENT*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
             player.y_vel += delta_time*GRAVITY
-            player.y_vel += keys[pygame.K_DOWN] * delta_time * FAST_FALL_COEFFICIENT
+            player.y_vel += keys[pygame.K_DOWN] * delta_time * abs(FAST_FALL_COEFFICIENT)
             if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
                 if player.y_vel > 0:
                     player.y_vel -= INSTANT_JUMP_VELOCITY
                 else:
                     player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time,(delta_time+player.grounded_timer))
-                    player.y_vel -= delta_time*player.x_vel
+                    player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
             player.x_vel *= delta_time * AIR_RESISTANCE_COEFFICIENT
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
