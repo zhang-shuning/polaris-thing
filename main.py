@@ -5,6 +5,8 @@ import enum
 import pygame
 from pygame.typing import Point
 
+import scripts.map_save
+
 HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
@@ -80,7 +82,7 @@ class ScreenSurface():
     Used by colliders and to render something
     Drawn around a rect, which the hitbox flag shows
     '''
-    def __init__(self, surface:pygame.Surface, rect:pygame.Rect, rect_offset = (0, 0), enabled = True, show_hitbox=False) -> None:
+    def __init__(self, surface:pygame.Surface, rect:pygame.Rect, rect_offset = (0, 0), enabled = True, show_hitbox=False, map=None) -> None:
         self.surface = surface
         self.rect = rect
         self.x_vel = 0
@@ -88,6 +90,7 @@ class ScreenSurface():
         self.enabled = enabled
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
+        self.map = map
     def draw(self):
         '''Draws onto the screen'''
         if not self.enabled:
@@ -171,7 +174,6 @@ player = Player(surface=pygame.image.load("assets/block1.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
 
 while running:
-    print(len(collider_list))
     delta_time = clock.tick(60)*3/50
     player.grounded_timer -= delta_time
     # event queue
@@ -195,7 +197,7 @@ while running:
                 rect = pygame.Rect(box_x*32, box_y*32, 32,32)
                 if not any(rect == collider.rect for collider in collider_list):
                     set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
-                                            rect=rect))
+                                            rect=rect, map = "assets/block1.png"))
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -203,6 +205,8 @@ while running:
             if event.key == pygame.K_b:
                 player.in_build = not player.in_build
                 print(player.in_build)
+            if event.key == pygame.K_EQUALS and player.in_build and current_screen == ScreenEnum.GAME:
+                scripts.map_save.write_map([(x.map, tuple(x.rect)) for x in collider_list])
 
     keys = pygame.key.get_pressed()
     #Clears screen
