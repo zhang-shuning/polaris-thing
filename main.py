@@ -21,12 +21,12 @@ HORIZONTAL_ACCELERATION_COEFFICIENT = .2 #Coefficient on acceleration
 GRAVITY = 0.1 #Coefficient on gravity
 FAST_FALL_COEFFICIENT = 0.2 # Coeficient on fast falling
 INSTANT_JUMP_VELOCITY = 2.5 # Minimum velocity gained while jumping
-JUMP_HOLD_COEFICIENT = .3 # Coefficient for holding the jump button for longer
+JUMP_HOLD_COEFICIENT = .3 # Coefficient for the speed of holding the jump button after a jump
 JUMP_HOLD_TIME = 6 # Amount of seconds *60/1000 to hold after a jump while getting acceleration
 JUMP_HORIZONTAL_PART = .05 #Coefficient on increased jump height for horizontal velocity
 HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
-
+WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
 
 
 running = True
@@ -135,10 +135,12 @@ class Player(ScreenSurface):
             if self.x_vel > 0:
                 self.x_pos = collided_distance - self.rect.width
                 self.rect.x = collided_distance - self.rect.width
+                self.x_vel *= WALL_HORIZONTAL_SPEED_PENELTY
             elif self.x_vel < 0:
                 collided_size = collider_list[x_intersect_index].rect.width
                 self.x_pos = collided_distance + collided_size
                 self.rect.x = collided_distance + collided_size 
+                self.x_vel *= WALL_HORIZONTAL_SPEED_PENELTY
 
     def check_y_collisions(self):
         #Repeat for y collisions
@@ -150,7 +152,7 @@ class Player(ScreenSurface):
                 self.rect.y = collided_distance - self.rect.height
                 self.y_vel = 0
                 self.grounded = True
-                self.grounded_timer = 24/5
+                self.grounded_timer = JUMP_HOLD_TIME
             elif self.y_vel < 0:
                 collided_size = collider_list[y_intersect_index].rect.height
                 self.y_pos = collided_distance + collided_size
@@ -191,14 +193,16 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if current_screen == ScreenEnum.MAIN_MENU:
-                if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
-                    current_screen = ScreenEnum.GAME
-                elif button_pos_dict[LEVEL_SELECTOR_NAME].collidepoint(pygame.mouse.get_pos()):
-                    current_screen = ScreenEnum.LEVEL_SELECTOR
-            elif current_screen == ScreenEnum.LEVEL_SELECTOR:
-                if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
-                    current_screen = ScreenEnum.GAME
+            match current_screen:
+                case ScreenEnum.MAIN_MENU:
+                    if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
+                        current_screen = ScreenEnum.GAME
+                    elif button_pos_dict[LEVEL_SELECTOR_NAME].collidepoint(pygame.mouse.get_pos()):
+                        current_screen = ScreenEnum.LEVEL_SELECTOR
+                case ScreenEnum.LEVEL_SELECTOR:
+                    if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
+                        current_screen = ScreenEnum.MAIN_MENU
+
             if event.button == 1 and player.in_build:
                 mouse_pos = pygame.mouse.get_pos()
                 box_x = mouse_pos[0]//32
@@ -208,7 +212,6 @@ while running:
                 if not any(rect == collider.rect for collider in collider_list):
                     set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
                                             rect=rect, map = "assets/block1.png"))
-
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 exit(0)
@@ -219,6 +222,8 @@ while running:
                 scripts.map_save.write_map([(x.map, tuple(x.rect)) for x in collider_list])
             if event.key == pygame.K_4:
                 load_map(4)
+            if event.key == pygame.K_3:
+                print("test")
 
     keys = pygame.key.get_pressed()
     #Clears screen
@@ -227,6 +232,8 @@ while running:
     match current_screen:
         case ScreenEnum.GAME:
             #In game
+            if pygame.Rect(player.rect.x, player.rect.y, player.rect.width, player.rect.height).collidelist(collider_list) != -1:
+                player.grounded_timer = 6
             #Horizontal movement
             player.x_vel += delta_time*HORIZONTAL_ACCELERATION_COEFFICIENT*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
             #Gravity
@@ -238,10 +245,11 @@ while running:
             if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
                 #Minimum jump velocity
                 if player.y_vel > 0:
-                    player.y_vel -= INSTANT_JUMP_VELOCITY
+                    player.y_vel = -INSTANT_JUMP_VELOCITY
                 else:
                     #Higher velocity for longer hold and faster horizontal speed
-                    player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time,(delta_time+player.grounded_timer))
+                    print(delta_time, (delta_time+player.grounded_timer), player.grounded_timer)
+                    player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time, (delta_time+player.grounded_timer))
                     player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
             #X axis air resistance
             player.x_vel *= delta_time * HORIZONTAL_AIR_RESISTANCE
