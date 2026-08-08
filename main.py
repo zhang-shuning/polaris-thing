@@ -71,9 +71,6 @@ class ScreenSurface():
         self.enabled = enabled
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
-        self.rect_list = []
-        self.res_y_pos = 100
-        self.res_x_pos = 100
     def draw(self):
         '''Draws onto the screen'''
         if not self.enabled:
@@ -103,6 +100,8 @@ class Player(ScreenSurface):
         self.y_vel = 0
         self.x_pos = rect.x
         self.y_pos = rect.x
+        self.res_y_pos = 100
+        self.res_x_pos = 100
         self.grounded = False
         self.grounded_timer = 0
         self.in_build = True
