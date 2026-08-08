@@ -1,10 +1,14 @@
 from __future__ import annotations
 from typing import override
+from sys import exit
+import enum
 import pygame
 from pygame.typing import Point
 
 HORIZONTAL_SIZE = 320
 VERTICAL_SIZE = 180
+
+START_GAME_NAME = "Start Game"
 
 running = True
 pygame.init()
@@ -13,10 +17,34 @@ pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
 
+#Gameplay
 surface_list:list[ScreenSurface] = []
 collider_list:list[ScreenSurface] = []
 screen_offset:int = 0
 screen_end:int = 0
+
+#Menus
+menu_loaded:bool = False
+button_pos_dict:dict[str, pygame.Rect] = {}
+
+small_text = pygame.font.Font(size=12)
+medium_text = pygame.font.Font()
+big_text = pygame.font.Font(size=36)
+
+def make_button(font:pygame.Font, text:str, position:tuple[int], text_color = (255, 255, 255), rectangle_color = (0, 0, 0)) -> None:
+    rendered_font = font.render(text, True, text_color)
+    font_rect = rendered_font.get_rect(center = position)
+    pygame.draw.rect(screen, rectangle_color, font_rect)
+    screen.blit(rendered_font, font_rect)
+    if text not in button_pos_dict:
+        button_pos_dict[text] = font_rect
+
+
+class ScreenEnum(enum.Enum):
+    GAME = enum.auto()
+    MAIN_MENU = enum.auto()
+
+current_screen = ScreenEnum.MAIN_MENU
 
 def set_collider(ss:ScreenSurface):
     '''Sets the ss to a collider and a surface'''
@@ -29,7 +57,7 @@ def set_surface(ss:ScreenSurface):
 
 class ScreenSurface():
     '''
-    A surface that gets drawn onto the screen that scrolls off the screen.
+    A surface that gets drawn onto the screen while the state is the game
     Used by colliders and to render something
     Drawn around a rect, which the hitbox flag shows
     '''
@@ -124,32 +152,47 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if current_screen == ScreenEnum.MAIN_MENU:
+                    if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
+                        current_screen = ScreenEnum.GAME
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                exit(0)
+
     keys = pygame.key.get_pressed()
-
-    player.x_vel += .01*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
-    player.y_vel += .01*(keys[pygame.K_DOWN] - keys[pygame.K_UP])
-
     #Clears screen
     screen.fill((50,50,50))
-    #Player moves
-    player.move()
-    #Offset is updated and everything is drawn
-    relative_screen_distance = player.x_pos - screen_offset
-    #Scroll right
-    if relative_screen_distance > HORIZONTAL_SIZE//2:
-        screen_offset = player.x_pos - HORIZONTAL_SIZE//2
-        if screen_offset > screen_end:
-            screen_offset = screen_end
-    #Scroll left
-    if relative_screen_distance < HORIZONTAL_SIZE//3:
-        screen_offset = player.x_pos - HORIZONTAL_SIZE//3
-        if screen_offset < 0:
-            screen_offset = 0
-    #Player is a surface but it's done seperately so that the player does not to be readded
-    player.draw()
-    for i in surface_list:
-        i.draw()
 
-
-    # updates the screen
-    pygame.display.flip()
+    match current_screen:
+        case ScreenEnum.GAME:
+            #In game
+            player.x_vel += .01*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            player.y_vel += .01*(keys[pygame.K_DOWN] - keys[pygame.K_UP])
+            #Player moves
+            player.move()
+            #Offset is updated and everything is drawn
+            relative_screen_distance = player.x_pos - screen_offset
+            #Scroll right
+            if relative_screen_distance > HORIZONTAL_SIZE//2:
+                screen_offset = player.x_pos - HORIZONTAL_SIZE//2
+                if screen_offset > screen_end:
+                    screen_offset = screen_end
+            #Scroll left
+            if relative_screen_distance < HORIZONTAL_SIZE//3:
+                screen_offset = player.x_pos - HORIZONTAL_SIZE//3
+                if screen_offset < 0:
+                    screen_offset = 0
+            #Player is a surface but it's done seperately so that the player does not to be readded
+            player.draw()
+            for i in surface_list:
+                i.draw()
+            # updates the screen
+            pygame.display.flip()
+        case ScreenEnum.MAIN_MENU:
+            #Main menu
+            if not menu_loaded:
+                pygame.mouse.set_visible(True)
+                make_button(big_text, START_GAME_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
+                menu_loaded = True
+                pygame.display.flip()
