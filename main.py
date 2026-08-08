@@ -68,11 +68,10 @@ class Player(ScreenSurface):
         super().__init__(surface, rect, rect_offset, enabled, show_hitbox)
         self.x_vel = 0
         self.y_vel = 0
-        self.x_pos = 0
-        self.y_pos = 0
+        self.x_pos = rect.x
+        self.y_pos = rect.x
 
     def check_x_collisions(self):
-        #Adds in the offset for this check, removes it afterwards
         #Check collisions, if collided, set x position to the x
         #Can be put into smaller steps if going through walls becomes an issue
         x_intersect_index = self.rect.collidelist(collider_list)
@@ -88,10 +87,10 @@ class Player(ScreenSurface):
                 self.rect.x = collided_distance + collided_size 
 
     def check_y_collisions(self):
+        #Repeat for y collisions
         y_intersect_index = self.rect.collidelist(collider_list)
         if y_intersect_index != -1:
             collided_distance = collider_list[y_intersect_index].rect.x
-            #Checks which way it collided from
             if self.y_vel > 0:
                 self.y_pos = collided_distance - self.rect.height
                 self.rect.y = collided_distance - self.rect.height
@@ -108,7 +107,7 @@ class Player(ScreenSurface):
         self.x_pos += self.x_vel
         self.rect.x = round(self.x_pos)
         self.check_x_collisions()
-        #Repeat for y collisions
+
         self.y_pos += self.y_vel
         self.rect.y = round(self.y_pos)
         self.check_y_collisions()
