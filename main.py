@@ -39,8 +39,6 @@ class ScreenSurface():
         self.enabled = enabled
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
-        self.rect.x += rect_offset[0]
-        self.rect.y += rect_offset[1]
 
     def draw(self):
         '''Draws onto the screen'''
