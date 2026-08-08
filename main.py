@@ -90,7 +90,9 @@ class ScreenSurface():
                             self.rect.width, self.rect.height),
                             width=1)
         for rect in self.rect_list:
-            pygame.draw.rect(screen, (0,255,0), rect)
+            set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"), show_hitbox=True,
+                           rect=rect))
+            
 
 class Player(ScreenSurface):
     '''This would be kinda a general moving class, but the only moving thing is the player'''
@@ -143,12 +145,12 @@ class Player(ScreenSurface):
         self.rect.y = round(self.y_pos)
         self.check_y_collisions()
 
-player = Player(surface=pygame.image.load("assets/block1.png"), rect_offset=(8, 8),
-                rect=pygame.Rect((0, 0), (16, 16)))
-set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"), rect_offset=(8, 8),
-                           rect=pygame.Rect((100, 80), (16, 16))))
-set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"), rect_offset=(8, 8),
-                           rect=pygame.Rect((120, 100), (16, 16))))
+player = Player(surface=pygame.image.load("assets/block1.png"),
+                rect=pygame.Rect((0, 0), (32,32)))
+set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
+                           rect=pygame.Rect((100, 80), (32,32))))
+set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
+                           rect=pygame.Rect((120, 100), (32,32))))
 
 while running:
     clock.tick(60)
@@ -162,7 +164,7 @@ while running:
                     current_screen = ScreenEnum.GAME
             if event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
-                player.rect_list.append((pygame.mouse.get_pos(),(50,50)))
+                player.rect_list.append((pygame.Rect(pygame.mouse.get_pos(),(32,32))))
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 exit(0)
