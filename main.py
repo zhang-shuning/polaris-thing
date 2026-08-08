@@ -5,8 +5,8 @@ import enum
 import pygame
 from pygame.typing import Point
 
-HORIZONTAL_SIZE = 320
-VERTICAL_SIZE = 180
+HORIZONTAL_SIZE = 640
+VERTICAL_SIZE = 360
 
 START_GAME_NAME = "Start Game"
 
@@ -140,11 +140,11 @@ class Player(ScreenSurface):
         self.rect.y = round(self.y_pos)
         self.check_y_collisions()
 
-player = Player(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
+player = Player(surface=pygame.image.load("assets/block1.png"), rect_offset=(8, 8),
                 rect=pygame.Rect((0, 0), (16, 16)))
-set_collider(ScreenSurface(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
+set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"), rect_offset=(8, 8),
                            rect=pygame.Rect((100, 80), (16, 16))))
-set_collider(ScreenSurface(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
+set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"), rect_offset=(8, 8),
                            rect=pygame.Rect((120, 100), (16, 16))))
 
 while running:
