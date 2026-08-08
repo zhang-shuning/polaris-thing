@@ -21,7 +21,7 @@ clock = pygame.time.Clock()
 surface_list:list[ScreenSurface] = []
 collider_list:list[ScreenSurface] = []
 screen_offset:int = 0
-screen_end:int = 1000
+screen_end:int = HORIZONTAL_SIZE
 
 #Menus
 menu_loaded:bool = False
