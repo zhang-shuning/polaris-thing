@@ -71,7 +71,9 @@ class ScreenSurface():
         self.enabled = enabled
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
-
+        self.rect_list = []
+        self.res_y_pos = 100
+        self.res_x_pos = 100
     def draw(self):
         '''Draws onto the screen'''
         if not self.enabled:
@@ -103,6 +105,7 @@ class Player(ScreenSurface):
         self.y_pos = rect.x
         self.grounded = False
         self.grounded_timer = 0
+        self.in_build = True
 
     def check_x_collisions(self):
         #Check collisions, if collided, set x position to the x
@@ -161,7 +164,7 @@ while running:
             if current_screen == ScreenEnum.MAIN_MENU:
                 if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.GAME
-            if event.button == 1:
+            if event.button == 1 and player.in_build:
                 mouse_pos = pygame.mouse.get_pos()
                 box_x = mouse_pos[0]//32
                 box_y = mouse_pos[1]//32
@@ -173,6 +176,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 exit(0)
+            if event.key == pygame.K_b:
+                player.in_build = not player.in_build
+                print(player.in_build)
 
     keys = pygame.key.get_pressed()
     #Clears screen
@@ -204,6 +210,10 @@ while running:
                 if screen_offset < 0:
                     screen_offset = 0
             #Player is a surface but it's done seperately so that the player does not to be readded
+            if player.y_pos > VERTICAL_SIZE:
+                player.y_pos = player.res_y_pos
+                player.x_pos = player.res_x_pos
+
             player.draw()
             for surface in surface_list:
                 surface.draw()
