@@ -8,9 +8,18 @@ from pygame.typing import Point
 HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
-FUZZY_ZERO = 0.001
-GRAVITY = 0.1
 START_GAME_NAME = "Start Game"
+
+FUZZY_ZERO = 0.001
+HORIZONTAL_VELOCITY_COEFFICIENT = .2
+GRAVITY = 0.1
+FAST_FALL_COEFFICIENT = 0.2
+INSTANT_JUMP_VELOCITY = 2.5
+JUMP_HOLD_COEFICIENT = .5
+JUMP_HOLD_TIME = 24/5
+AIR_RESISTANCE_COEFFICIENT = .95
+
+
 
 running = True
 pygame.init()
@@ -94,15 +103,15 @@ class Player(ScreenSurface):
     @override
     def __init__(self, surface: pygame.Surface, rect: pygame.Rect, rect_offset=(0, 0), enabled=True, show_hitbox=False) -> None:
         super().__init__(surface, rect, rect_offset, enabled, show_hitbox)
-        self.x_vel = 0
-        self.y_vel = 0
-        self.x_pos = rect.x
-        self.y_pos = rect.x
+        self.x_vel:float = 0
+        self.y_vel:float = 0
+        self.x_pos:float = rect.x
+        self.y_pos:float = rect.x
         self.res_y_pos = 100
         self.res_x_pos = 100
-        self.grounded = False
-        self.grounded_timer = 0
-        self.in_build = True
+        self.grounded:bool = False
+        self.grounded_timer:float = 0
+        self.in_build:bool = True
 
     def check_x_collisions(self):
         #Check collisions, if collided, set x position to the x
@@ -129,7 +138,7 @@ class Player(ScreenSurface):
                 self.rect.y = collided_distance - self.rect.height
                 self.y_vel = 0
                 self.grounded = True
-                self.grounded_timer = 80*3/50
+                self.grounded_timer = 24/5
             elif self.y_vel < 0:
                 collided_size = collider_list[y_intersect_index].rect.height
                 self.y_pos = collided_distance + collided_size
@@ -186,15 +195,16 @@ while running:
     match current_screen:
         case ScreenEnum.GAME:
             #In game
-            player.x_vel += delta_time*.25*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            player.x_vel += delta_time*HORIZONTAL_VELOCITY_COEFFICIENT*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
             player.y_vel += delta_time*GRAVITY
+            player.y_vel += keys[pygame.K_DOWN] * delta_time * FAST_FALL_COEFFICIENT
             if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-                print("very real jump", player.y_vel)
                 if player.y_vel > 0:
-                    player.y_vel -= 2.5
+                    player.y_vel -= INSTANT_JUMP_VELOCITY
                 else:
-                    player.y_vel -= .5*min(delta_time,(delta_time+player.grounded_timer))
-            player.x_vel *= delta_time*0.95
+                    player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time,(delta_time+player.grounded_timer))
+                    player.y_vel -= delta_time*player.x_vel
+            player.x_vel *= delta_time * AIR_RESISTANCE_COEFFICIENT
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
             if abs(player.y_vel) < FUZZY_ZERO:
