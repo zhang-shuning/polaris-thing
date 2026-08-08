@@ -39,6 +39,8 @@ class ScreenSurface():
         self.enabled = enabled
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
+        self.rect.x += rect_offset[0]
+        self.rect.y += rect_offset[1]
 
     def draw(self):
         '''Draws onto the screen'''
@@ -51,11 +53,11 @@ class ScreenSurface():
         if self.rect.x > screen_offset + HORIZONTAL_SIZE:
            return
         screen.blit(source=self.surface,
-                    dest=(self.rect.x - screen_offset, self.rect.y))
+                    dest=(self.rect.x - screen_offset - self.rect_offset[0], self.rect.y - self.rect_offset[1]))
         if self.show_hitbox:
             pygame.draw.rect(surface=screen,
                             color=(255, 0, 0), 
-                            rect=(self.rect.x - screen_offset + self.rect_offset[0], self.rect.y + self.rect_offset[1],
+                            rect=(self.rect.x - screen_offset, self.rect.y,
                             self.rect.width, self.rect.height),
                             width=1)
 
@@ -71,7 +73,6 @@ class Player(ScreenSurface):
 
     def check_x_collisions(self):
         #Adds in the offset for this check, removes it afterwards
-        self.rect.x += self.rect_offset[0]
         #Check collisions, if collided, set x position to the x
         #Can be put into smaller steps if going through walls becomes an issue
         x_intersect_index = self.rect.collidelist(collider_list)
@@ -107,16 +108,14 @@ class Player(ScreenSurface):
         self.x_pos += self.x_vel
         self.rect.x = round(self.x_pos)
         self.check_x_collisions()
-        self.rect.x -= self.rect_offset[0]
         #Repeat for y collisions
         self.y_pos += self.y_vel
         self.rect.y = round(self.y_pos)
         self.check_y_collisions()
-        self.rect.y -= self.rect_offset[0]
 
-player = Player(surface=pygame.image.load("assets/temphole.png"),
+player = Player(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
                 rect=pygame.Rect((0, 0), (16, 16)), show_hitbox=True)
-set_collider(ScreenSurface(surface=pygame.image.load("assets/temphole.png"),
+set_collider(ScreenSurface(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
                            rect=pygame.Rect((100, 0), (16, 16)), show_hitbox=True))
 
 while running:
