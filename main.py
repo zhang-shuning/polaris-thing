@@ -41,7 +41,6 @@ def make_button(font:pygame.Font, text:str, position:tuple[int], text_color = (2
     if text not in button_pos_dict:
         button_pos_dict[text] = font_rect
 
-
 class ScreenEnum(enum.Enum):
     GAME = enum.auto()
     MAIN_MENU = enum.auto()
@@ -89,7 +88,6 @@ class ScreenSurface():
                             rect=(self.rect.x - screen_offset, self.rect.y,
                             self.rect.width, self.rect.height),
                             width=1)
-            
 
 class Player(ScreenSurface):
     '''This would be kinda a general moving class, but the only moving thing is the player'''
@@ -192,7 +190,10 @@ while running:
             player.y_vel += delta_time*GRAVITY
             if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
                 print("very real jump", player.y_vel)
-                player.y_vel -= 2
+                if player.y_vel > 0:
+                    player.y_vel -= 2
+                else:
+                    player.y_vel -= .5*delta_time
             player.x_vel *= delta_time*0.95
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
