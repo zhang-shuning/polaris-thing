@@ -6,7 +6,7 @@ pygame.init()
 screen = pygame.display.set_mode((320,180),vsync=1,flags = pygame.FULLSCREEN|pygame.SCALED)
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
-
+clock = pygame.time.Clock()
 collider_list:list[pygame.Rect] = []
 
 class Player():
@@ -47,7 +47,7 @@ class Player():
 player = Player(pygame.image.load("assets/temphole.png"), pygame.FRect((0, 0), (16, 16)))
 
 while running:
-    
+    clock.tick(60)
     # event queue
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
