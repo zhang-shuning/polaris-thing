@@ -113,7 +113,7 @@ class Player(ScreenSurface):
 player = Player(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
                 rect=pygame.Rect((0, 0), (16, 16)), show_hitbox=True)
 set_collider(ScreenSurface(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
-                           rect=pygame.Rect((100, 0), (16, 16)), show_hitbox=True))
+                           rect=pygame.Rect((100, 100), (16, 16)), show_hitbox=True))
 
 while running:
     clock.tick(60)
@@ -121,7 +121,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    player.x_vel = 1
+    keys = pygame.key.get_pressed()
+
+    player.x_vel += .01*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+    player.y_vel += .01*(keys[pygame.K_DOWN] - keys[pygame.K_UP])
+
     #Clears screen
     screen.fill((50,50,50))
     #Player moves
