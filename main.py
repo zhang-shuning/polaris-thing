@@ -176,10 +176,11 @@ while running:
             if current_screen == ScreenEnum.MAIN_MENU:
                 if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.GAME
-            if event.button == 1 and player.in_build:
-                mouse_pos = pygame.mouse.get_pos()
-                box_x = mouse_pos[0]//32
-                box_y = mouse_pos[1]//32
+            elif current_screen == ScreenEnum.GAME:
+                if event.button == 1 and player.in_build:
+                    mouse_pos = pygame.mouse.get_pos()
+                    box_x = mouse_pos[0]//32
+                    box_y = mouse_pos[1]//32
                 
                 rect = pygame.Rect(box_x*32, box_y*32, 32,32)
                 set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
