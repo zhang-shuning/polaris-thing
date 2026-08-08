@@ -9,12 +9,13 @@ pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
 collider_list:list[pygame.Rect] = []
 
-class player():
+class Player():
     def __init__(self, surface:pygame.Surface, frect:pygame.FRect) -> None:
         self.surface = surface
         self.frect = frect
         self.x_vel = 0
         self.y_vel = 0
+        self.enabled = True
 
     def move(self):
         '''
@@ -35,7 +36,9 @@ class player():
             self.frect.y = collider_list[y_intersect_index].y
 
     def draw(self):
-        pass
+        screen.blit(source=self.surface, dest=(round(self.frect.x), round(self.frect.y)))
+
+#player = Player(pygame.image.load())
 
 while running:
     
