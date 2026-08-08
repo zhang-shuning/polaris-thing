@@ -70,7 +70,8 @@ class ScreenSurface():
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
         self.rect_list = []
-
+        self.res_y_pos = 100
+        self.res_x_pos = 100
     def draw(self):
         '''Draws onto the screen'''
         if not self.enabled:
@@ -179,8 +180,8 @@ while running:
     match current_screen:
         case ScreenEnum.GAME:
             #In game
-            player.x_vel += .01*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
-            player.y_vel += .01*(keys[pygame.K_DOWN] - keys[pygame.K_UP])
+            player.x_vel += 0.05*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            player.y_vel += 0.05*(keys[pygame.K_DOWN] - keys[pygame.K_UP])
             #Player moves
             player.move()
             #Offset is updated and everything is drawn
@@ -196,6 +197,10 @@ while running:
                 if screen_offset < 0:
                     screen_offset = 0
             #Player is a surface but it's done seperately so that the player does not to be readded
+            if player.y_pos > VERTICAL_SIZE:
+                player.y_pos = player.res_y_pos
+                player.x_pos = player.res_x_pos
+
             player.draw()
             for surface in surface_list:
                 surface.draw()
