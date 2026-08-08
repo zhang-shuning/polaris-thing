@@ -9,6 +9,8 @@ HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
 START_GAME_NAME = "Start Game"
+LEVEL_SELECTOR_NAME = "Level\n Selector"
+RETURN_MENU = "BACK TO \nMAIN MENU"
 
 #Physics constants
 #Most of these are multiplied by frametime * 60/1000
@@ -40,6 +42,7 @@ screen_end:int = HORIZONTAL_SIZE
 
 #Menus
 menu_loaded:bool = False
+level_selector_loaded:bool = False
 button_pos_dict:dict[str, pygame.Rect] = {}
 
 small_text = pygame.font.Font(size=12)
@@ -57,6 +60,8 @@ def make_button(font:pygame.Font, text:str, position:tuple[int], text_color = (2
 class ScreenEnum(enum.Enum):
     GAME = enum.auto()
     MAIN_MENU = enum.auto()
+    LEVEL_SELECTOR = enum.auto()
+
 
 current_screen = ScreenEnum.MAIN_MENU
 
@@ -166,6 +171,7 @@ player = Player(surface=pygame.image.load("assets/block1.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
 
 while running:
+    print(current_screen)
     delta_time = clock.tick(60)*3/50
     player.grounded_timer -= delta_time
     # event queue
@@ -176,11 +182,15 @@ while running:
             if current_screen == ScreenEnum.MAIN_MENU:
                 if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.GAME
-            elif current_screen == ScreenEnum.GAME:
-                if event.button == 1 and player.in_build:
-                    mouse_pos = pygame.mouse.get_pos()
-                    box_x = mouse_pos[0]//32
-                    box_y = mouse_pos[1]//32
+                elif button_pos_dict[LEVEL_SELECTOR_NAME].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.LEVEL_SELECTOR
+            elif current_screen == ScreenEnum.LEVEL_SELECTOR:
+                if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.GAME
+            if event.button == 1 and player.in_build:
+                mouse_pos = pygame.mouse.get_pos()
+                box_x = mouse_pos[0]//32
+                box_y = mouse_pos[1]//32
                 
                 rect = pygame.Rect(box_x*32, box_y*32, 32,32)
                 set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
@@ -242,6 +252,8 @@ while running:
             if player.y_pos > VERTICAL_SIZE:
                 player.y_pos = player.res_y_pos
                 player.x_pos = player.res_x_pos
+                player.x_vel = 0
+                player.y_vel = 0
 
             player.draw()
             for surface in surface_list:
@@ -258,5 +270,14 @@ while running:
             if not menu_loaded:
                 pygame.mouse.set_visible(True)
                 make_button(big_text, START_GAME_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
+                make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/10, VERTICAL_SIZE/10))
                 menu_loaded = True
+                menu_loaded = False
+                pygame.display.flip()
+        case ScreenEnum.LEVEL_SELECTOR:
+            if not level_selector_loaded:
+                make_button(big_text, "LEVELS", (HORIZONTAL_SIZE/2, 15))
+                make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-15))
+                level_selector_loaded = True
+                menu_loaded = False
                 pygame.display.flip()
