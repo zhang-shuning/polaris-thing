@@ -8,11 +8,24 @@ from pygame.typing import Point
 HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
-FUZZY_ZERO = 0.001
-GRAVITY = 0.05
 START_GAME_NAME = "Start Game"
 LEVEL_SELECTOR_NAME = "Level\n Selector"
 RETURN_MENU = "BACK TO \nMAIN MENU"
+
+#Physics constants
+#Most of these are multiplied by frametime * 60/1000
+FUZZY_ZERO = 0.001 #Amount where velocity rounds to 0
+HORIZONTAL_ACCELERATION_COEFFICIENT = .2 #Coefficient on acceleration
+GRAVITY = 0.1 #Coefficient on gravity
+FAST_FALL_COEFFICIENT = 0.2 # Coeficient on fast falling
+INSTANT_JUMP_VELOCITY = 2.5 # Minimum velocity gained while jumping
+JUMP_HOLD_COEFICIENT = .3 # Coefficient for holding the jump button for longer
+JUMP_HOLD_TIME = 6 # Amount of seconds *60/1000 to hold after a jump while getting acceleration
+JUMP_HORIZONTAL_PART = .05 #Coefficient on increased jump height for horizontal velocity
+HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
+VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
+
+
 
 running = True
 pygame.init()
@@ -43,7 +56,6 @@ def make_button(font:pygame.Font, text:str, position:tuple[int], text_color = (2
     screen.blit(rendered_font, font_rect)
     if text not in button_pos_dict:
         button_pos_dict[text] = font_rect
-
 
 class ScreenEnum(enum.Enum):
     GAME = enum.auto()
@@ -94,22 +106,21 @@ class ScreenSurface():
                             rect=(self.rect.x - screen_offset, self.rect.y,
                             self.rect.width, self.rect.height),
                             width=1)
-            
 
 class Player(ScreenSurface):
     '''This would be kinda a general moving class, but the only moving thing is the player'''
     @override
     def __init__(self, surface: pygame.Surface, rect: pygame.Rect, rect_offset=(0, 0), enabled=True, show_hitbox=False) -> None:
         super().__init__(surface, rect, rect_offset, enabled, show_hitbox)
-        self.x_vel = 0
-        self.y_vel = 0
-        self.x_pos = rect.x
-        self.y_pos = rect.x
+        self.x_vel:float = 0
+        self.y_vel:float = 0
+        self.x_pos:float = rect.x
+        self.y_pos:float = rect.x
         self.res_y_pos = 100
         self.res_x_pos = 100
-        self.grounded = False
-        self.grounded_timer = 0
-        self.in_build = True
+        self.grounded:bool = False
+        self.grounded_timer:float = 0
+        self.in_build:bool = True
 
     def check_x_collisions(self):
         #Check collisions, if collided, set x position to the x
@@ -136,6 +147,7 @@ class Player(ScreenSurface):
                 self.rect.y = collided_distance - self.rect.height
                 self.y_vel = 0
                 self.grounded = True
+                self.grounded_timer = 24/5
             elif self.y_vel < 0:
                 collided_size = collider_list[y_intersect_index].rect.height
                 self.y_pos = collided_distance + collided_size
@@ -161,6 +173,7 @@ player = Player(surface=pygame.image.load("assets/block1.png"),
 while running:
     print(current_screen)
     delta_time = clock.tick(60)*3/50
+    player.grounded_timer -= delta_time
     # event queue
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -197,16 +210,32 @@ while running:
     match current_screen:
         case ScreenEnum.GAME:
             #In game
-            player.x_vel += delta_time*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            #Horizontal movement
+            player.x_vel += delta_time*HORIZONTAL_ACCELERATION_COEFFICIENT*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            #Gravity
             player.y_vel += delta_time*GRAVITY
+            #Fast fall
+            if not keys[pygame.K_UP]:
+                player.y_vel += keys[pygame.K_DOWN] * delta_time * abs(FAST_FALL_COEFFICIENT)
+            #Jumping
             if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-                print("very real jump", player.y_vel)
-                player.y_vel -= 10
-            player.x_vel *= delta_time*0.95
+                #Minimum jump velocity
+                if player.y_vel > 0:
+                    player.y_vel -= INSTANT_JUMP_VELOCITY
+                else:
+                    #Higher velocity for longer hold and faster horizontal speed
+                    player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time,(delta_time+player.grounded_timer))
+                    player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
+            #X axis air resistance
+            player.x_vel *= delta_time * AIR_RESISTANCE_COEFFICIENT
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
+            if abs(player.y_vel) < FUZZY_ZERO:
+                player.y_vel = 0
             #Player moves
             player.move()
+            if player.grounded_timer < 0:
+                player.grounded = False
             #Offset is updated and everything is drawn
             relative_screen_distance = player.x_pos - screen_offset
             #Scroll right
