@@ -6,7 +6,7 @@ pygame.init()
 screen = pygame.display.set_mode((320,180),vsync=1,flags = pygame.FULLSCREEN|pygame.SCALED)
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
-
+clock = pygame.time.Clock()
 collider_list:list[pygame.Rect] = []
 
 class player():
@@ -38,7 +38,7 @@ class player():
         pass
 
 while running:
-    
+    clock.tick(60)
     # event queue
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
