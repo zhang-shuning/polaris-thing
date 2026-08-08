@@ -10,15 +10,18 @@ VERTICAL_SIZE = 360
 
 START_GAME_NAME = "Start Game"
 
-FUZZY_ZERO = 0.001
-HORIZONTAL_VELOCITY_COEFFICIENT = .2
-GRAVITY = 0.1
-FAST_FALL_COEFFICIENT = 0.2
-INSTANT_JUMP_VELOCITY = 2.5
-JUMP_HOLD_COEFICIENT = .5
-JUMP_HOLD_TIME = 24/5
-JUMP_HORIZONTAL_PART = .1
-AIR_RESISTANCE_COEFFICIENT = .95
+#Physics constants
+#Most of these are multiplied by frametime * 60/1000
+FUZZY_ZERO = 0.001 #Amount where velocity rounds to 0
+HORIZONTAL_ACCELERATION_COEFFICIENT = .2 #Coefficient on acceleration
+GRAVITY = 0.1 #Coefficient on gravity
+FAST_FALL_COEFFICIENT = 0.2 # Coeficient on fast falling
+INSTANT_JUMP_VELOCITY = 2.5 # Minimum velocity gained while jumping
+JUMP_HOLD_COEFICIENT = .3 # Coefficient for holding the jump button for longer
+JUMP_HOLD_TIME = 6 # Amount of seconds *60/1000 to hold after a jump while getting acceleration
+JUMP_HORIZONTAL_PART = .05 #Coefficient on increased jump height for horizontal velocity
+HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
+VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 
 
 
@@ -196,15 +199,23 @@ while running:
     match current_screen:
         case ScreenEnum.GAME:
             #In game
-            player.x_vel += delta_time*HORIZONTAL_VELOCITY_COEFFICIENT*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            #Horizontal movement
+            player.x_vel += delta_time*HORIZONTAL_ACCELERATION_COEFFICIENT*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            #Gravity
             player.y_vel += delta_time*GRAVITY
-            player.y_vel += keys[pygame.K_DOWN] * delta_time * abs(FAST_FALL_COEFFICIENT)
+            #Fast fall
+            if not keys[pygame.K_UP]:
+                player.y_vel += keys[pygame.K_DOWN] * delta_time * abs(FAST_FALL_COEFFICIENT)
+            #Jumping
             if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
+                #Minimum jump velocity
                 if player.y_vel > 0:
                     player.y_vel -= INSTANT_JUMP_VELOCITY
                 else:
+                    #Higher velocity for longer hold and faster horizontal speed
                     player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time,(delta_time+player.grounded_timer))
                     player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
+            #X axis air resistance
             player.x_vel *= delta_time * AIR_RESISTANCE_COEFFICIENT
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
