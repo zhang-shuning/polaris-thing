@@ -171,7 +171,7 @@ player = Player(surface=pygame.image.load("assets/block1.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
 
 while running:
-    print(current_screen)
+    print(len(collider_list))
     delta_time = clock.tick(60)*3/50
     player.grounded_timer -= delta_time
     # event queue
@@ -193,7 +193,8 @@ while running:
                 box_y = mouse_pos[1]//32
                 
                 rect = pygame.Rect(box_x*32, box_y*32, 32,32)
-                set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
+                if not any(rect == collider.rect for collider in collider_list):
+                    set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
                                             rect=rect))
 
         if event.type == pygame.KEYDOWN:
