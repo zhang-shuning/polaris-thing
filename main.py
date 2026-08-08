@@ -100,6 +100,7 @@ class Player(ScreenSurface):
         self.y_vel = 0
         self.x_pos = rect.x
         self.y_pos = rect.x
+        self.in_build = True
 
     def check_x_collisions(self):
         #Check collisions, if collided, set x position to the x
@@ -146,7 +147,6 @@ player = Player(surface=pygame.image.load("assets/block1.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
 
 while running:
-    print(clock.get_fps())
     clock.tick(60)
     # event queue
     for event in pygame.event.get():
@@ -156,7 +156,7 @@ while running:
             if current_screen == ScreenEnum.MAIN_MENU:
                 if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.GAME
-            if event.button == 1:
+            if event.button == 1 and player.in_build:
                 mouse_pos = pygame.mouse.get_pos()
                 box_x = mouse_pos[0]//32
                 box_y = mouse_pos[1]//32
@@ -168,6 +168,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 exit(0)
+            if event.key == pygame.K_b:
+                player.in_build = not player.in_build
+                print(player.in_build)
 
     keys = pygame.key.get_pressed()
     #Clears screen
