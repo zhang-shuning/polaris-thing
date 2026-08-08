@@ -9,7 +9,7 @@ HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
 FUZZY_ZERO = 0.001
-GRAVITY = 0.05
+GRAVITY = 0.1
 START_GAME_NAME = "Start Game"
 
 running = True
@@ -186,7 +186,7 @@ while running:
     match current_screen:
         case ScreenEnum.GAME:
             #In game
-            player.x_vel += delta_time*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            player.x_vel += delta_time*.25*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
             player.y_vel += delta_time*GRAVITY
             if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
                 print("very real jump", player.y_vel)
