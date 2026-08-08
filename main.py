@@ -45,6 +45,5 @@ while running:
             running = False
     # drawing
     screen.fill((50,50,50))
-    pygame.draw.circle(screen,(0,0,0),pygame.mouse.get_pos(),1)
     # updates the screen
     pygame.display.flip()
