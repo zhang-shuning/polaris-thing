@@ -193,15 +193,15 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            match current_screen:
-                case ScreenEnum.MAIN_MENU:
-                    if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
-                        current_screen = ScreenEnum.GAME
-                    elif button_pos_dict[LEVEL_SELECTOR_NAME].collidepoint(pygame.mouse.get_pos()):
-                        current_screen = ScreenEnum.LEVEL_SELECTOR
-                case ScreenEnum.LEVEL_SELECTOR:
-                    if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
-                        current_screen = ScreenEnum.MAIN_MENU
+            if current_screen == ScreenEnum.MAIN_MENU:
+                if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.GAME
+                elif button_pos_dict[LEVEL_SELECTOR_NAME].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.LEVEL_SELECTOR
+
+            elif current_screen == ScreenEnum.LEVEL_SELECTOR:
+                if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.MAIN_MENU
 
             if event.button == 1 and player.in_build:
                 mouse_pos = pygame.mouse.get_pos()
@@ -217,13 +217,6 @@ while running:
                 exit(0)
             if event.key == pygame.K_b:
                 player.in_build = not player.in_build
-                print(player.in_build)
-            if event.key == pygame.K_EQUALS and player.in_build and current_screen == ScreenEnum.GAME:
-                scripts.map_save.write_map([(x.map, tuple(x.rect)) for x in collider_list])
-            if event.key == pygame.K_4:
-                load_map(4)
-            if event.key == pygame.K_3:
-                print("test")
 
     keys = pygame.key.get_pressed()
     #Clears screen
@@ -252,6 +245,7 @@ while running:
                     player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time, (delta_time+player.grounded_timer))
                     player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
             #X axis air resistance
+            player.x_vel *= delta_time * HORIZONTAL_AIR_RESISTANCE
             player.x_vel *= delta_time * HORIZONTAL_AIR_RESISTANCE
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
@@ -297,12 +291,12 @@ while running:
                 make_button(big_text, START_GAME_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
                 make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/10, VERTICAL_SIZE/10))
                 menu_loaded = True
-                menu_loaded = False
+                level_selector_loaded = False
                 pygame.display.flip()
         case ScreenEnum.LEVEL_SELECTOR:
             if not level_selector_loaded:
                 make_button(big_text, "LEVELS", (HORIZONTAL_SIZE/2, 15))
-                make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-15))
+                make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
                 level_selector_loaded = True
                 menu_loaded = False
                 pygame.display.flip()
