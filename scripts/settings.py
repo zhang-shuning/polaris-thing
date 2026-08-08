@@ -9,3 +9,4 @@ CONTROLS_PATH = SAVE_FOLDER_PATH / "controls"
 
 def ensure_save_folder_exists():
     SAVE_FOLDER_PATH.touch()
+
