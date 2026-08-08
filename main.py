@@ -146,6 +146,7 @@ set_collider(ScreenSurface(surface=pygame.image.load("assets/temphole.png"), rec
                            rect=pygame.Rect((100, 80), (16, 16))))
 set_collider(ScreenSurface(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
                            rect=pygame.Rect((120, 100), (16, 16))))
+
 while running:
     clock.tick(60)
     # event queue
@@ -185,8 +186,8 @@ while running:
                     screen_offset = 0
             #Player is a surface but it's done seperately so that the player does not to be readded
             player.draw()
-            for i in surface_list:
-                i.draw()
+            for surface in surface_list:
+                surface.draw()
             # updates the screen
             pygame.display.flip()
         case ScreenEnum.MAIN_MENU:
