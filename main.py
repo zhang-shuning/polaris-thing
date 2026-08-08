@@ -30,6 +30,7 @@ def set_surface(ss:ScreenSurface):
 class ScreenSurface():
     '''
     A surface that gets drawn onto the screen that scrolls off the screen.
+    Used by colliders and to render something
     Drawn around a rect, which the hitbox flag shows
     '''
     def __init__(self, surface:pygame.Surface, rect:pygame.Rect, rect_offset = (0, 0), enabled = True, show_hitbox=False) -> None:
@@ -137,6 +138,8 @@ while running:
     #Scroll right
     if relative_screen_distance > HORIZONTAL_SIZE//2:
         screen_offset = player.x_pos - HORIZONTAL_SIZE//2
+        if screen_offset > screen_end:
+            screen_offset = screen_end
     #Scroll left
     if relative_screen_distance < HORIZONTAL_SIZE//3:
         screen_offset = player.x_pos - HORIZONTAL_SIZE//3
