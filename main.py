@@ -228,7 +228,7 @@ while running:
                     player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time,(delta_time+player.grounded_timer))
                     player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
             #X axis air resistance
-            player.x_vel *= delta_time * AIR_RESISTANCE_COEFFICIENT
+            player.x_vel *= delta_time * HORIZONTAL_AIR_RESISTANCE
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
             if abs(player.y_vel) < FUZZY_ZERO:
