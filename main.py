@@ -89,7 +89,7 @@ class Player(ScreenSurface):
         #Repeat for y collisions
         y_intersect_index = self.rect.collidelist(collider_list)
         if y_intersect_index != -1:
-            collided_distance = collider_list[y_intersect_index].rect.x
+            collided_distance = collider_list[y_intersect_index].rect.y
             if self.y_vel > 0:
                 self.y_pos = collided_distance - self.rect.height
                 self.rect.y = collided_distance - self.rect.height
@@ -112,10 +112,11 @@ class Player(ScreenSurface):
         self.check_y_collisions()
 
 player = Player(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
-                rect=pygame.Rect((0, 0), (16, 16)), show_hitbox=True)
+                rect=pygame.Rect((0, 0), (16, 16)))
 set_collider(ScreenSurface(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
-                           rect=pygame.Rect((100, 100), (16, 16)), show_hitbox=True))
-
+                           rect=pygame.Rect((100, 80), (16, 16))))
+set_collider(ScreenSurface(surface=pygame.image.load("assets/temphole.png"), rect_offset=(8, 8),
+                           rect=pygame.Rect((120, 100), (16, 16))))
 while running:
     clock.tick(60)
     # event queue
