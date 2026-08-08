@@ -170,6 +170,13 @@ class Player(ScreenSurface):
         self.rect.y = round(self.y_pos)
         self.check_y_collisions()
 
+def load_map(number):
+    collider_list.clear()
+    surface_list.clear()
+    maps = scripts.map_save.read_map(number)
+    for i in maps:
+        set_collider(ScreenSurface(pygame.image.load(i[0]), rect = pygame.Rect(i[1])))
+
 player = Player(surface=pygame.image.load("assets/block1.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
 
@@ -207,6 +214,8 @@ while running:
                 print(player.in_build)
             if event.key == pygame.K_EQUALS and player.in_build and current_screen == ScreenEnum.GAME:
                 scripts.map_save.write_map([(x.map, tuple(x.rect)) for x in collider_list])
+            if event.key == pygame.K_4:
+                load_map(4)
 
     keys = pygame.key.get_pressed()
     #Clears screen
