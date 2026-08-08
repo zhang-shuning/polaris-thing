@@ -174,8 +174,11 @@ def load_map(number):
     collider_list.clear()
     surface_list.clear()
     maps = scripts.map_save.read_map(number)
-    for i in maps:
-        set_collider(ScreenSurface(pygame.image.load(i[0]), rect = pygame.Rect(i[1])))
+    try:
+        for i in maps:
+            set_collider(ScreenSurface(pygame.image.load(i[0]), rect = pygame.Rect(i[1])))
+    except ValueError:
+        print("Map does not exist, something might've broken!")
 
 player = Player(surface=pygame.image.load("assets/block1.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
