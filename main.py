@@ -131,6 +131,7 @@ class Player(ScreenSurface):
                 self.rect.y = collided_distance - self.rect.height
                 self.y_vel = 0
                 self.grounded = True
+                self.grounded_timer = 80*3/50
             elif self.y_vel < 0:
                 collided_size = collider_list[y_intersect_index].rect.height
                 self.y_pos = collided_distance + collided_size
@@ -155,6 +156,7 @@ player = Player(surface=pygame.image.load("assets/block1.png"),
 
 while running:
     delta_time = clock.tick(60)*3/50
+    player.grounded_timer -= delta_time
     # event queue
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -190,7 +192,7 @@ while running:
             player.y_vel += delta_time*GRAVITY
             if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
                 print("very real jump", player.y_vel)
-                player.y_vel -= 10
+                player.y_vel -= 2
             player.x_vel *= delta_time*0.95
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
@@ -198,6 +200,8 @@ while running:
                 player.y_vel = 0
             #Player moves
             player.move()
+            if player.grounded_timer < 0:
+                player.grounded = False
             #Offset is updated and everything is drawn
             relative_screen_distance = player.x_pos - screen_offset
             #Scroll right
