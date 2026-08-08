@@ -194,6 +194,8 @@ while running:
             player.x_vel *= delta_time*0.95
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
+            if abs(player.y_vel) < FUZZY_ZERO:
+                player.y_vel = 0
             #Player moves
             player.move()
             #Offset is updated and everything is drawn
