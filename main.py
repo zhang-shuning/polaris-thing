@@ -89,9 +89,6 @@ class ScreenSurface():
                             rect=(self.rect.x - screen_offset, self.rect.y,
                             self.rect.width, self.rect.height),
                             width=1)
-        for rect in self.rect_list:
-            set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"), show_hitbox=True,
-                           rect=rect))
             
 
 class Player(ScreenSurface):
@@ -147,12 +144,9 @@ class Player(ScreenSurface):
 
 player = Player(surface=pygame.image.load("assets/block1.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
-set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
-                           rect=pygame.Rect((100, 80), (32,32))))
-set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
-                           rect=pygame.Rect((120, 100), (32,32))))
 
 while running:
+    print(clock.get_fps())
     clock.tick(60)
     # event queue
     for event in pygame.event.get():
@@ -164,7 +158,13 @@ while running:
                     current_screen = ScreenEnum.GAME
             if event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
-                player.rect_list.append((pygame.Rect(pygame.mouse.get_pos(),(32,32))))
+                box_x = mouse_pos[0]//32
+                box_y = mouse_pos[1]//32
+                
+                rect = pygame.Rect(box_x*32, box_y*32, 32,32)
+                set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
+                                            rect=rect))
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 exit(0)
@@ -196,7 +196,12 @@ while running:
             player.draw()
             for surface in surface_list:
                 surface.draw()
-            # updates the screen
+            for i in range(HORIZONTAL_SIZE//32):
+                pygame.draw.line(screen, (255,255,255),(i*32,0),(i*32,VERTICAL_SIZE))
+            for n in range(VERTICAL_SIZE//32):
+                pygame.draw.line(screen, (255,255,255),(0,n*32),(HORIZONTAL_SIZE,n*32))
+            pygame.draw.line(screen, (255,255,255),(0,11*32),(HORIZONTAL_SIZE,11*32))
+            #updates the screen
             pygame.display.flip()
         case ScreenEnum.MAIN_MENU:
             #Main menu
