@@ -247,7 +247,8 @@ def load_map(number):
 
 
 player = Player(surface=pygame.image.load("assets/player.png"),
-                rect=pygame.Rect((0, 0), (28, 28)), rect_offset=(2, 2))
+                rect=pygame.Rect((0,0), (28, 28)), rect_offset=(2, 2))
+player.rect = pygame.Rect((player.res_x_pos,player.res_y_pos),(28,28))
 
 tile_size = (32,32)
 def connect_textures():
