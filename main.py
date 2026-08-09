@@ -33,7 +33,8 @@ HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
 
-BLACK_HOLE_STRENGTH = 25
+BLACK_HOLE_STRENGTH = 10
+MAX_BLACK_HOLE_ACCELERATION = .01 #Controls max black hole acceleration in a single tick
 
 running = True
 pygame.init()
@@ -193,10 +194,19 @@ class Player(ScreenSurface):
             distx = vec*math.sin(math.atan2(black_hole.rect.x - self.x_pos, black_hole.rect.y - self.y_pos))
             disty = vec*math.cos(math.atan2(black_hole.rect.x - self.x_pos, black_hole.rect.y - self.y_pos))
             strength = BLACK_HOLE_STRENGTH/vec
-            print(distx, disty)
-            print(strength/(distx*math.sin(theta)), strength/(disty*math.cos(theta)))
+            print(strength)
+            if strength > MAX_BLACK_HOLE_ACCELERATION:
+                strength = MAX_BLACK_HOLE_ACCELERATION
             self.x_vel += strength/(distx*math.sin(theta))
             self.y_vel -= strength/(disty*math.cos(theta))
+            if black_hole.rect.colliderect(self.rect):
+                self.respawn()
+
+    def respawn(self):
+        self.y_pos = self.res_y_pos
+        self.x_pos = self.res_x_pos
+        self.x_vel = 0
+        self.y_vel = 0
 
 def load_map(number):
     collider_list.clear()
@@ -214,7 +224,7 @@ def load_map(number):
 player = Player(surface=pygame.image.load("assets/player.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
 
-black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"), rect=pygame.Rect(200,200,32,32), show_hitbox=True)
+black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"), rect=pygame.Rect(200,200,16,16), rect_offset=(8,8), show_hitbox=True)
 set_black_hole(black_hole_test)
 
 while running:
@@ -314,10 +324,7 @@ while running:
                     screen_offset = 0
             #Player is a surface but it's done seperately so that the player does not to be readded
             if player.y_pos > VERTICAL_SIZE:
-                player.y_pos = player.res_y_pos
-                player.x_pos = player.res_x_pos
-                player.x_vel = 0
-                player.y_vel = 0
+                player.respawn()
 
             player.draw()
             for surface in surface_list:
