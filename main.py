@@ -229,8 +229,8 @@ class Player(ScreenSurface):
         global current_screen
         #Vectors because surely that will help
         for black_hole in white_hole_list:
-            dx = black_hole.rect.centerx - self.x_pos
-            dy = black_hole.rect.centery - self.y_pos
+            dx = black_hole.rect.centerx - self.rect.centerx
+            dy = black_hole.rect.centery - self.rect.centery
             if abs(dx) <= 64 and abs(dy) <= 64:
                 dist_sq = dx**2 + dy**2
                 dist = math.sqrt(dist_sq)
@@ -252,8 +252,8 @@ def create_black_hole(coordinates:tuple[int, int], show_hitbox = False):
                                      rect=pygame.Rect((coordinates), (8, 8)), map="assets/temphole.png",
                                      rect_offset=(12,12), show_hitbox=show_hitbox, group=3)
 def create_white_hole(coordinates:tuple[int, int], show_hitbox = False):
-    black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"),
-                                     rect=pygame.Rect((coordinates), (8, 8)), map="assets/temphole.png",
+    black_hole_test = ScreenSurface(pygame.image.load("assets/whitehole.png"),
+                                     rect=pygame.Rect((coordinates), (8, 8)), map="assets/whitehole.png",
                                      rect_offset=(12,12), show_hitbox=show_hitbox, group=4)   
 
 def load_map(number):
