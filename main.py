@@ -49,12 +49,13 @@ collider_list:list[ScreenSurface] = []
 black_hole_list:list[ScreenSurface] = []
 screen_offset:int = 0
 screen_end:int = HORIZONTAL_SIZE
+res_x_list = []
+res_y_list = []
 
 #Menus
 menu_loaded:bool = False
 level_selector_loaded:bool = False
 button_pos_dict:dict[str, pygame.Rect] = {}
-
 small_text = pygame.font.Font(size=12)
 medium_text = pygame.font.Font()
 big_text = pygame.font.Font(size=36)
@@ -208,6 +209,8 @@ class Player(ScreenSurface):
 def load_map(number):
     collider_list.clear()
     surface_list.clear()
+    player.res_x_pos = res_x_list[number]
+    player.res_y_pos = res_y_list[number]
     maps = scripts.map_save.read_map(number)
     try:
         if maps is not None:
