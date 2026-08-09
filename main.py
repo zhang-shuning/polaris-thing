@@ -45,6 +45,7 @@ pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
 res_list_x = [100,100,20,20,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
 res_list_y = [330,300,300,300,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+won_levels = {x:False for x in range(1,10)}
 
 #Gameplay
 surface_list:list[ScreenSurface] = []
@@ -510,6 +511,11 @@ while running:
             player.handle_black_hole()
             if player.handle_white_hole():
                 #Won
+                level_selector_loaded = False
+                menu_loaded = False
+                escape_loaded = True
+                player.first = True
+                current_screen = ScreenEnum.LEVEL_SELECTOR
                 pass
 
             #Player moves
