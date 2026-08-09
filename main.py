@@ -410,7 +410,7 @@ while running:
                 screen_offset = player.x_pos - HORIZONTAL_SIZE//3
                 if screen_offset < 0:
                     screen_offset = 0
-            #Player is a surface but it's done seperately so that the player does not to be readded
+            #Player is a surface but it's done seperately so that the player does not need to be readded
             if player.y_pos > VERTICAL_SIZE:
                 player.respawn()
 
