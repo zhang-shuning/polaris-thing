@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import override
+from typing import override, overload
 from sys import exit
 import enum
 import math
@@ -34,7 +34,7 @@ VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
 
 BLACK_HOLE_STRENGTH = 30
-MAX_BLACK_HOLE_ACCELERATION = 5 #Controls max black hole acceleration in a single tick
+MAX_BLACK_HOLE_ACCELERATION = 10 #Controls max black hole acceleration in a single tick
 
 running = True
 pygame.init()
@@ -206,9 +206,14 @@ class Player(ScreenSurface):
         self.x_vel = 0
         self.y_vel = 0
 
+def create_black_hole(coordinates:tuple[int, int], show_hitbox = False):
+    black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"), rect=pygame.Rect((coordinates), (8, 8)), rect_offset=(12,12), show_hitbox=show_hitbox)
+    set_black_hole(black_hole_test)
+
 def load_map(number):
     collider_list.clear()
     surface_list.clear()
+    black_hole_list.clear()
     player.res_x_pos = res_x_list[number]
     player.res_y_pos = res_y_list[number]
     maps = scripts.map_save.read_map(number)
@@ -223,9 +228,7 @@ def load_map(number):
 
 player = Player(surface=pygame.image.load("assets/player.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
-
-black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"), rect=pygame.Rect(200,200,16,16), rect_offset=(8,8), show_hitbox=True)
-set_black_hole(black_hole_test)
+create_black_hole((240, 208))
 
 while running:
     delta_time = clock.tick(60)*3/50
