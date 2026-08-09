@@ -96,8 +96,11 @@ class ScreenSurface():
     A surface that gets drawn onto the screen while the state is the game
     Used by colliders and to render something
     Drawn around a rect, which the hitbox flag shows
+    Group 1 is surface
+    Group 2 is collider
+    Group 3 is black holw
     '''
-    def __init__(self, surface:pygame.Surface, rect:pygame.Rect, rect_offset = (0, 0), enabled = True, show_hitbox=False, map=None) -> None:
+    def __init__(self, surface:pygame.Surface, rect:pygame.Rect, rect_offset = (0, 0), enabled = True, show_hitbox=False, map=None, group=0) -> None:
         self.surface = surface
         self.rect = rect
         self.x_vel = 0
@@ -106,6 +109,13 @@ class ScreenSurface():
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
         self.map = map
+        if group == 1:
+            set_surface(self)
+        elif group == 2:
+            set_collider(self)
+        elif group == 3:
+            set_black_hole(self)
+
     def draw(self):
         '''Draws onto the screen'''
         if not self.enabled:
