@@ -506,7 +506,7 @@ while running:
                 escape_loaded = False
                 current_screen = ScreenEnum.ESCAPE_MENU
             if event.key == pygame.K_ESCAPE and current_screen == ScreenEnum.LEVEL_SELECTOR:
-                current_screen = ScreenEnum.MAIN_MENU
+                current_screen = ScreenEnum.MAIN_ME
             if event.key == pygame.K_b:
                 player.in_build = not player.in_build
             if event.key == pygame.K_s and current_screen == ScreenEnum.GAME and event.mod & pygame.KMOD_CTRL:
