@@ -17,7 +17,7 @@ RESUME_GAME = "    \nResume Game\n    "
 LEVEL_SELECTOR_NAME = "\n      Play      \n\n"
 MAIN_MENU = "      \nMain Menu\n      "
 RETURN_MENU = "Back To \nMain Menu"
-QUIT_TEXT = "  Quit Game  "
+QUIT_TEXT = "\n    Quit Game    \n\n"
 RESET_WINS = "    Reset\n    levels    "
 escape_loaded = False
 RANGE = 120
@@ -68,6 +68,7 @@ button_pos_dict:dict[str, pygame.Rect] = {}
 small_text = pygame.font.Font(size=12)
 medium_text = pygame.font.Font()
 big_text = pygame.font.Font(size=36)
+huge_text = pygame.font.Font(size=60)
 map_number = -1
 
 def make_button(font:pygame.Font, text:str, position:tuple[int], text_color = (255, 255, 255), rectangle_color = (0, 0, 0)) -> None:
@@ -606,9 +607,9 @@ right:right
 Slow Fall:z
 Fast Fall:x/down
 Restart: hold r''', (75, VERTICAL_SIZE-50))
-                make_text(big_text, "CATACLYSMIC HOLES", (HORIZONTAL_SIZE/2, 75))
+                make_text(huge_text, "CATACLYSMIC HOLES", (HORIZONTAL_SIZE/2, 75))
                 make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
-                make_button(big_text, QUIT_TEXT, (HORIZONTAL_SIZE - 80, VERTICAL_SIZE - 20))
+                make_button(big_text, QUIT_TEXT, (HORIZONTAL_SIZE/2, 4*VERTICAL_SIZE/5))
                 menu_loaded = True
                 level_selector_loaded = False
                 escape_loaded = False
@@ -633,9 +634,9 @@ Restart: hold r''', (75, VERTICAL_SIZE-50))
                 for i in range(3):
                     for j in range(3):
                         if won_levels[1+j*3+i]:
-                            make_button(big_text, f"{1+j*3+i}", ((HORIZONTAL_SIZE//5)*(1.5+i), (VERTICAL_SIZE//5)*(1.5+j)), (0, 255, 0))
+                            make_button(huge_text, f"{1+j*3+i}", ((HORIZONTAL_SIZE//5)*(1.5+i), (VERTICAL_SIZE//5)*(1.5+j)), (0, 255, 0))
                         else:
-                            make_button(big_text, f"{1+j*3+i}", ((HORIZONTAL_SIZE//5)*(1.5+i), (VERTICAL_SIZE//5)*(1.5+j)))
+                            make_button(huge_text, f"{1+j*3+i}", ((HORIZONTAL_SIZE//5)*(1.5+i), (VERTICAL_SIZE//5)*(1.5+j)))
                 level_selector_loaded = True
                 menu_loaded = False
                 escape_loaded = False
