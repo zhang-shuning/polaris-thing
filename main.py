@@ -185,8 +185,78 @@ def load_map(number):
     except ValueError:
         print("Map does not exist, something might've broken!")
 
+
 player = Player(surface=pygame.image.load("assets/player.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
+tile_dict = {}
+tile_size = (32,32)
+def temp():
+   
+    for ss in collider_list:
+        tile_dict[str(ss.rect.topleft)] = ss
+    for ss in collider_list:
+        if tile_dict[str(ss.rect.topleft)] != None:
+            block_left = False
+            block_right = False
+            block_up = False
+            block_down = False
+            if tile_dict.get(str((ss.rect.x-32, ss.rect.y))) != None: block_left = True
+            if tile_dict.get(str((ss.rect.x+32, ss.rect.y))) != None: block_right = True
+            if tile_dict.get(str((ss.rect.x, ss.rect.y-32))) != None: block_up = True
+            if tile_dict.get(str((ss.rect.x, ss.rect.y+32))) != None: block_down = True
+            truth_list = [block_left,block_right,block_up,block_down]
+            match truth_list:
+                case [1,0,0,0]:
+                    tile_img = 'assets/horiblock.png'
+                    tile_pos = (64,0)  
+                case [0,1,0,0]:
+                    tile_img = 'assets/horiblock.png'
+                    tile_pos = (0,0)
+                case [1,1,0,0]:
+                    tile_img = 'assets/horiblock.png'
+                    tile_pos = (32,0)
+                case [0,0,1,0]:
+                    tile_img = 'assets/verblock.png'
+                    tile_pos = (0,64)  
+                case [0,0,0,1]:
+                    tile_img = 'assets/verblock.png'
+                    tile_pos = (0,0)   
+                case [0,0,1,1]:
+                    tile_img = 'assets/verblock.png'
+                    tile_pos = (0,32)         
+                case [0,1,0,1]:
+                    tile_img = 'assets/bigone.png'
+                    tile_pos = (0,0)       
+                case [1,1,0,1]:
+                    tile_img = 'assets/bigone.png'
+                    tile_pos = (32,0)
+                case [1,0,0,1]:
+                    tile_img = 'assets/bigone.png'
+                    tile_pos = (64,0)   
+                case [0,1,1,1]:
+                    tile_img = 'assets/bigone.png'
+                    tile_pos = (0,32)   
+                case [1,1,1,1]:
+                    tile_img = 'assets/bigone.png'
+                    tile_pos = (32,32)  
+                case [1,0,1,1]:
+                    tile_img = 'assets/bigone.png'
+                    tile_pos = (64,32) 
+                case [0,1,1,0]:
+                    tile_img = 'assets/bigone.png'
+                    tile_pos = (0,64) 
+                case [1,1,1,0]:
+                    tile_img = 'assets/bigone.png'
+                    tile_pos = (32,64)     
+                case [1,0,1,0]:
+                    tile_img = 'assets/bigone.png'
+                    tile_pos = (64,64)                                  
+                case _:
+                    tile_img = 'assets/block1.png'
+                    tile_pos = (0,0)
+            tile_surface = pygame.image.load(tile_img)
+            pygame.Surface.convert_alpha(tile_surface)
+            tile_dict[str(ss.rect.topleft)].surface = pygame.Surface.subsurface(tile_surface,((tile_pos),(32,32)))
 
 while running:
     delta_time = clock.tick(60)*3/50
@@ -217,6 +287,7 @@ while running:
                 if not any(rect == collider.rect for collider in collider_list):
                     set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
                                             rect=rect, map = "assets/block1.png"))
+                    temp()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 current_screen = ScreenEnum.MAIN_MENU
@@ -283,11 +354,10 @@ while running:
             player.draw()
             for surface in surface_list:
                 surface.draw()
-            for i in range(HORIZONTAL_SIZE//32):
-                pygame.draw.line(screen, (255,255,255),(i*32,0),(i*32,VERTICAL_SIZE))
-            for n in range(VERTICAL_SIZE//32):
-                pygame.draw.line(screen, (255,255,255),(0,n*32),(HORIZONTAL_SIZE,n*32))
-            pygame.draw.line(screen, (255,255,255),(0,11*32),(HORIZONTAL_SIZE,11*32))
+           # for i in range(HORIZONTAL_SIZE//32 + 1):
+            #    pygame.draw.line(screen, (255,255,255),(i*32,0),(i*32,VERTICAL_SIZE))
+            #for n in range(VERTICAL_SIZE//32 + 1):
+            #    pygame.draw.line(screen, (255,255,255),(0,n*32),(HORIZONTAL_SIZE,n*32))
             #updates the screen
             pygame.display.flip()
             menu_loaded = False
