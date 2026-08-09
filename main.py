@@ -44,8 +44,8 @@ screen = pygame.display.set_mode((HORIZONTAL_SIZE, VERTICAL_SIZE),vsync=1,flags 
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
-res_list_x = [100,100,20,20,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
-res_list_y = [330,300,300,300,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_x = [100,100,20,20,96,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_y = [330,300,300,300,0,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
 won_levels = {x:False for x in range(1,10)}
 
 #Gameplay
@@ -215,6 +215,12 @@ class Player(ScreenSurface):
                 self.y_pos = collided_distance + collided_size
                 self.rect.y = collided_distance + collided_size
                 self.y_vel = 0
+        if self.rect.y < 0:
+            self.y_pos = 0
+            self.y_vel = 0
+            self.rect.y = 0
+        if self.y_pos > VERTICAL_SIZE:
+            self.respawn()
 
     def move(self):
         '''
@@ -267,6 +273,8 @@ class Player(ScreenSurface):
     def respawn(self):
         self.y_pos = self.res_y_pos
         self.x_pos = self.res_x_pos
+        self.rect.x = self.x_pos
+        self.rect.y = self.y_pos
         self.x_vel = 0
         self.y_vel = 0
 
@@ -450,12 +458,15 @@ while running:
                     if index != 1:
                         for surface in surface_list:
                             if surface.rect.collidepoint(mouse_pos):
+                                print(surface)
                                 surface_list.remove(surface)   
                                 try:
                                     black_hole_list.remove(surface)
+                                except ValueError:   
+                                    pass
+                                try:
                                     white_hole_list.remove(surface)
                                 except ValueError:
-                                    
                                     pass
                                 try:
                                     collider_list.remove(surface)
@@ -489,7 +500,6 @@ while running:
         case ScreenEnum.GAME:
             #In game 
             fps = round(clock.get_fps())
-            make_button(big_text,f'{fps}',(200,50))
             if pygame.Rect(player.rect.x, player.rect.y, player.rect.width, player.rect.height).collidelist(collider_list) != -1:
                 player.grounded_timer = 6
             #Horizontal movement
@@ -543,9 +553,6 @@ while running:
                 if screen_offset < 0:
                     screen_offset = 0
             #Player is a surface but it's done seperately so that the player does not need to be readded
-            if player.y_pos > VERTICAL_SIZE:
-                player.respawn()
-
             player.draw()
             for surface in surface_list:
                 surface.draw()
@@ -553,6 +560,7 @@ while running:
             #    pygame.draw.line(screen, (255,255,255),(i*32,0),(i*32,VERTICAL_SIZE))
             #for n in range(VERTICAL_SIZE//32 + 1):
             #    pygame.draw.line(screen, (255,255,255),(0,n*32),(HORIZONTAL_SIZE,n*32))
+            make_button(big_text,f'{fps}',(HORIZONTAL_SIZE-20,20))
             #updates the screen
             pygame.display.flip()
             menu_loaded = False
