@@ -196,15 +196,18 @@ def load_map(number):
     surface_list.clear()
     maps = scripts.map_save.read_map(number)
     try:
-        for i in maps:
-            set_collider(ScreenSurface(pygame.image.load(i[0]), rect = pygame.Rect(i[1])))
+        if maps is not None:
+            for i in maps:
+                set_collider(ScreenSurface(pygame.image.load(i[0]), rect = pygame.Rect(i[1])))
+        else:
+            print("That map does not exist")
     except ValueError:
         print("Map does not exist, something might've broken!")
 
 player = Player(surface=pygame.image.load("assets/player.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
 
-black_hole_test = ScreenSurface(pygame.image.load("assets/temp-hole-pixilart.png"), rect=pygame.Rect(200,200,32,32), show_hitbox=True)
+black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"), rect=pygame.Rect(200,200,32,32), show_hitbox=True)
 set_black_hole(black_hole_test)
 
 while running:
@@ -226,6 +229,11 @@ while running:
             elif current_screen == ScreenEnum.LEVEL_SELECTOR:
                 if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
+                for i in range(25):
+                    if button_pos_dict[str(i)].collidepoint(pygame.mouse.get_pos()):
+                        load_map(i)
+                        current_screen = ScreenEnum.GAME
+                        break
             elif current_screen == ScreenEnum.ESCAPE_MENU:
                 if button_pos_dict[RESUME_GAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.GAME
@@ -339,6 +347,9 @@ while running:
             if not level_selector_loaded:
                 make_button(big_text, "LEVELS", (HORIZONTAL_SIZE/2, 15))
                 make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
+                for i in range(5):
+                    for j in range(5):
+                        make_button(big_text, f"{1+i*5+j}", ((HORIZONTAL_SIZE//7)*(1.5+i), (VERTICAL_SIZE//7)*(1.5+j)))
                 level_selector_loaded = True
                 menu_loaded = False
                 escape_loaded = False
