@@ -198,7 +198,7 @@ def load_map(number):
     except ValueError:
         print("Map does not exist, something might've broken!")
 
-player = Player(surface=pygame.image.load("assets/block1.png"),
+player = Player(surface=pygame.image.load("assets/player.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
 
 black_hole_test = ScreenSurface(pygame.image.load("assets/temp-hole-pixilart.png"), rect=pygame.Rect(200,200,32,32), show_hitbox=True)
@@ -242,7 +242,7 @@ while running:
 
     keys = pygame.key.get_pressed()
     #Clears screen
-    screen.fill((50,50,50))
+    screen.blit(pygame.image.load("assets/background.png"))
 
     match current_screen:
         case ScreenEnum.GAME:
