@@ -88,7 +88,6 @@ def load_wins():
             return
         f.seek(0)
         wins:dict = json.load(f)
-        print(wins)
         for k,v in wins.items():
             won_levels[int(k)] = v
 
@@ -261,7 +260,8 @@ class Player(ScreenSurface):
                     if black_hole.rect.colliderect(self.rect):
                         won_levels[map_number] = True
                         save_wins()
-                        current_screen = ScreenEnum.MAIN_MENU
+                        return True
+        return False
 
     def respawn(self):
         self.y_pos = self.res_y_pos
@@ -402,6 +402,7 @@ while running:
                 if button_pos_dict[LEVEL_SELECTOR_NAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.LEVEL_SELECTOR
                 elif button_pos_dict[QUIT_TEXT].collidepoint(pygame.mouse.get_pos()):
+                    print("Quitting")
                     running = False
 
             elif current_screen == ScreenEnum.LEVEL_SELECTOR:
@@ -508,7 +509,10 @@ while running:
             if abs(player.y_vel) < FUZZY_ZERO:
                 player.y_vel = 0
             player.handle_black_hole()
-            player.handle_white_hole()
+            if player.handle_white_hole():
+                #Won
+                pass
+
             #Player moves
             player.move()
             if player.grounded_timer < 0:
