@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing import override
+from typing import override, overload
 from sys import exit
 import enum
+import math
 import pygame
 from pygame.typing import Point
 
@@ -11,10 +12,12 @@ HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
 START_GAME_NAME = "Start Game"
+RESUME_GAME = "Resume Game"
 LEVEL_SELECTOR_NAME = "Level\n Selector"
-RETURN_MENU = "BACK TO \nMAIN MENU"
-QUIT_TEXT = "QUIT GAME"
-
+RETURN_MENU = "Back To \nMain Menu"
+QUIT_TEXT = "Quit Game"
+escape_loaded = False
+RANGE = 120
 
 #Physics constants
 #Most of these are multiplied by frametime * 60/1000
@@ -30,7 +33,8 @@ HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
 
-
+BLACK_HOLE_STRENGTH = 30
+MAX_BLACK_HOLE_ACCELERATION = 10 #Controls max black hole acceleration in a single tick
 
 running = True
 pygame.init()
@@ -42,14 +46,16 @@ clock = pygame.time.Clock()
 #Gameplay
 surface_list:list[ScreenSurface] = []
 collider_list:list[ScreenSurface] = []
+black_hole_list:list[ScreenSurface] = []
 screen_offset:int = 0
 screen_end:int = HORIZONTAL_SIZE
+res_x_list = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+res_y_list = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 #Menus
 menu_loaded:bool = False
 level_selector_loaded:bool = False
 button_pos_dict:dict[str, pygame.Rect] = {}
-
 small_text = pygame.font.Font(size=12)
 medium_text = pygame.font.Font()
 big_text = pygame.font.Font(size=36)
@@ -66,6 +72,7 @@ class ScreenEnum(enum.Enum):
     GAME = enum.auto()
     MAIN_MENU = enum.auto()
     LEVEL_SELECTOR = enum.auto()
+    ESCAPE_MENU = enum.auto()
 
 
 current_screen = ScreenEnum.MAIN_MENU
@@ -77,6 +84,11 @@ def set_collider(ss:ScreenSurface):
 
 def set_surface(ss:ScreenSurface):
     '''Sets the ss to a surface'''
+    surface_list.append(ss)
+
+def set_black_hole(ss:ScreenSurface):
+    '''Sets the ss to be a blakc hole'''
+    black_hole_list.append(ss)
     surface_list.append(ss)
 
 class ScreenSurface():
@@ -175,13 +187,42 @@ class Player(ScreenSurface):
         self.rect.y = round(self.y_pos)
         self.check_y_collisions()
 
+    def handle_black_hole(self):
+        #Vectors because surely that will help
+        for black_hole in black_hole_list:
+            dx = black_hole.rect.centerx - self.x_pos
+            dy = black_hole.rect.centery - self.y_pos
+            dist_sq = dx**2 + dy**2
+            dist = math.sqrt(dist_sq)
+            strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
+            self.x_vel += strength*dx/dist
+            self.y_vel += strength*dy/dist
+            if black_hole.rect.colliderect(self.rect):
+                self.respawn()
+
+    def respawn(self):
+        self.y_pos = self.res_y_pos
+        self.x_pos = self.res_x_pos
+        self.x_vel = 0
+        self.y_vel = 0
+
+def create_black_hole(coordinates:tuple[int, int], show_hitbox = False):
+    black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"), rect=pygame.Rect((coordinates), (8, 8)), rect_offset=(12,12), show_hitbox=show_hitbox)
+    set_black_hole(black_hole_test)
+
 def load_map(number):
     collider_list.clear()
     surface_list.clear()
+    black_hole_list.clear()
+    player.res_x_pos = res_x_list[number]
+    player.res_y_pos = res_y_list[number]
     maps = scripts.map_save.read_map(number)
     try:
-        for i in maps:
-            set_collider(ScreenSurface(pygame.image.load(i[0]), rect = pygame.Rect(i[1])))
+        if maps is not None:
+            for i in maps:
+                set_collider(ScreenSurface(pygame.image.load(i[0]), rect = pygame.Rect(i[1])))
+        else:
+            print("That map does not exist")
     except ValueError:
         print("Map does not exist, something might've broken!")
 
@@ -277,8 +318,18 @@ while running:
             elif current_screen == ScreenEnum.LEVEL_SELECTOR:
                 if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
+                for i in range(1, 26):
+                    if button_pos_dict[str(i)].collidepoint(pygame.mouse.get_pos()):
+                        load_map(i)
+                        current_screen = ScreenEnum.GAME
+                        break
+            elif current_screen == ScreenEnum.ESCAPE_MENU:
+                if button_pos_dict[RESUME_GAME].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.GAME
+                elif button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.MAIN_MENU
 
-            if event.button == 1 and player.in_build:
+            if event.button == 1 and player.in_build and current_screen == ScreenEnum.GAME:
                 mouse_pos = pygame.mouse.get_pos()
                 box_x = mouse_pos[0]//32
                 box_y = mouse_pos[1]//32
@@ -288,17 +339,21 @@ while running:
                     set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
                                             rect=rect, map = "assets/block1.png"))
                     temp()
+            elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
+                rect = pygame.Rect(pygame.mouse.get_pos(), (32,32))
+                pass
+
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                current_screen = ScreenEnum.MAIN_MENU
+            if event.key == pygame.K_ESCAPE and ScreenEnum.GAME:
+                escape_loaded = False
+                current_screen = ScreenEnum.ESCAPE_MENU
             if event.key == pygame.K_b:
                 player.in_build = not player.in_build
 
 
     keys = pygame.key.get_pressed()
     #Clears screen
-    screen.blit(pygame.image.load("assets/background.png"))
-
+    screen.fill((50,50,50))
     match current_screen:
         case ScreenEnum.GAME:
             #In game
@@ -318,7 +373,6 @@ while running:
                     player.y_vel = -INSTANT_JUMP_VELOCITY
                 else:
                     #Higher velocity for longer hold and faster horizontal speed
-                    print(delta_time, (delta_time+player.grounded_timer), player.grounded_timer)
                     player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time, (delta_time+player.grounded_timer))
                     player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
             #X axis air resistance
@@ -328,6 +382,7 @@ while running:
                 player.x_vel = 0
             if abs(player.y_vel) < FUZZY_ZERO:
                 player.y_vel = 0
+            player.handle_black_hole()
             #Player moves
             player.move()
             if player.grounded_timer < 0:
@@ -346,10 +401,7 @@ while running:
                     screen_offset = 0
             #Player is a surface but it's done seperately so that the player does not to be readded
             if player.y_pos > VERTICAL_SIZE:
-                player.y_pos = player.res_y_pos
-                player.x_pos = player.res_x_pos
-                player.x_vel = 0
-                player.y_vel = 0
+                player.respawn()
 
             player.draw()
             for surface in surface_list:
@@ -365,16 +417,30 @@ while running:
             #Main menu
             if not menu_loaded:
                 pygame.mouse.set_visible(True)
-                make_button(big_text, START_GAME_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
-                make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/10, VERTICAL_SIZE/10))
+                make_button(big_text, START_GAME_NAME, (HORIZONTAL_SIZE/10, VERTICAL_SIZE/10))
+                make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
                 make_button(big_text, QUIT_TEXT, (HORIZONTAL_SIZE - 80, VERTICAL_SIZE - 20))
                 menu_loaded = True
                 level_selector_loaded = False
+                escape_loaded = False
+                pygame.display.flip()
+        case ScreenEnum.ESCAPE_MENU:
+
+            if not escape_loaded:
+                make_button(big_text, RESUME_GAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
+                make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
+                level_selector_loaded = False
+                menu_loaded = False
+                escape_loaded = True
                 pygame.display.flip()
         case ScreenEnum.LEVEL_SELECTOR:
             if not level_selector_loaded:
                 make_button(big_text, "LEVELS", (HORIZONTAL_SIZE/2, 15))
                 make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
+                for i in range(5):
+                    for j in range(5):
+                        make_button(big_text, f"{1+i*5+j}", ((HORIZONTAL_SIZE//7)*(1.5+i), (VERTICAL_SIZE//7)*(1.5+j)))
                 level_selector_loaded = True
                 menu_loaded = False
+                escape_loaded = False
                 pygame.display.flip()
