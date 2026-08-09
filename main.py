@@ -150,6 +150,7 @@ class Player(ScreenSurface):
         self.grounded:bool = False
         self.grounded_timer:float = 0
         self.in_build:bool = True
+        self.first:bool = True
 
     def check_x_collisions(self):
         #Check collisions, if collided, set x position to the x
@@ -340,8 +341,9 @@ while running:
                 elif button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
                     map_number = -1
-
-            if event.button == 1 and player.in_build and current_screen == ScreenEnum.GAME:
+            if player.first:
+                player.first = False
+            elif event.button == 1 and player.in_build and current_screen == ScreenEnum.GAME:
                 mouse_pos = pygame.mouse.get_pos()
                 box_x = mouse_pos[0]//32
                 box_y = mouse_pos[1]//32
@@ -435,6 +437,7 @@ while running:
                 menu_loaded = True
                 level_selector_loaded = False
                 escape_loaded = False
+                player.first = True
                 pygame.display.flip()
         case ScreenEnum.ESCAPE_MENU:
 
@@ -444,6 +447,7 @@ while running:
                 level_selector_loaded = False
                 menu_loaded = False
                 escape_loaded = True
+                player.first = True
                 pygame.display.flip()
         case ScreenEnum.LEVEL_SELECTOR:
             if not level_selector_loaded:
@@ -455,4 +459,6 @@ while running:
                 level_selector_loaded = True
                 menu_loaded = False
                 escape_loaded = False
+                player.first = True
                 pygame.display.flip()
+
