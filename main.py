@@ -241,8 +241,8 @@ player = Player(surface=pygame.image.load("assets/player.png"),
                 rect=pygame.Rect((0, 0), (28, 28)), rect_offset=(2, 2))
 tile_dict = {}
 tile_size = (32,32)
-def temp():
-   
+def connect_textures():
+    
     for ss in collider_list:
         tile_dict[str(ss.rect.topleft)] = ss
     for ss in collider_list:
@@ -256,16 +256,20 @@ def temp():
             if tile_dict.get(str((ss.rect.x, ss.rect.y-32))) != None: block_up = True
             if tile_dict.get(str((ss.rect.x, ss.rect.y+32))) != None: block_down = True
             truth_list = [block_left,block_right,block_up,block_down]
+            rotateable = False
+            rotateable180 = False
             match truth_list:
                 case [1,0,0,0]:
                     tile_img = 'assets/horiblock.png'
                     tile_pos = (64,0)  
+                    
                 case [0,1,0,0]:
                     tile_img = 'assets/horiblock.png'
                     tile_pos = (0,0)
                 case [1,1,0,0]:
                     tile_img = 'assets/horiblock.png'
                     tile_pos = (32,0)
+                    rotateable180 = True   
                 case [0,0,1,0]:
                     tile_img = 'assets/verblock.png'
                     tile_pos = (0,64)  
@@ -274,7 +278,8 @@ def temp():
                     tile_pos = (0,0)   
                 case [0,0,1,1]:
                     tile_img = 'assets/verblock.png'
-                    tile_pos = (0,32)         
+                    tile_pos = (0,32) 
+                    rotateable180 = True        
                 case [0,1,0,1]:
                     tile_img = 'assets/bigone.png'
                     tile_pos = (0,0)       
@@ -289,7 +294,8 @@ def temp():
                     tile_pos = (0,32)   
                 case [1,1,1,1]:
                     tile_img = 'assets/bigone.png'
-                    tile_pos = (32,32)  
+                    tile_pos = (32,32)
+                    rotateable = True  
                 case [1,0,1,1]:
                     tile_img = 'assets/bigone.png'
                     tile_pos = (64,32) 
@@ -307,7 +313,17 @@ def temp():
                     tile_pos = (0,0)
             tile_surface = pygame.image.load(tile_img)
             pygame.Surface.convert_alpha(tile_surface)
-            tile_dict[str(ss.rect.topleft)].surface = pygame.Surface.subsurface(tile_surface,((tile_pos),(32,32)))
+            if rotateable:
+                random_num = pygame.time.get_ticks()%4
+                tile_dict[str(ss.rect.topleft)].surface = (
+                pygame.transform.rotate(pygame.Surface.subsurface(tile_surface,((tile_pos),(32,32))),random_num*90))
+            elif rotateable180:   
+                random_num = pygame.time.get_ticks()%2
+                tile_dict[str(ss.rect.topleft)].surface = (
+                pygame.transform.rotate(pygame.Surface.subsurface(tile_surface,((tile_pos),(32,32))),random_num*180))
+            else:
+                tile_dict[str(ss.rect.topleft)].surface = pygame.Surface.subsurface(tile_surface,((tile_pos),(32,32)))
+
 
 while running:
     delta_time = clock.tick(60)*3/50
@@ -346,7 +362,8 @@ while running:
                 if not any(rect == collider.rect for collider in collider_list):
                     ScreenSurface(surface=pygame.image.load("assets/block1.png"),
                                             rect=rect, map = "assets/block1.png", group=2)
-                    temp()
+                    connect_textures()
+                    tile_dict = {}
             elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
                 create_black_hole(pygame.mouse.get_pos())
 
