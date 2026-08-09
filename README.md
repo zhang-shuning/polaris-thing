@@ -31,3 +31,6 @@ This is the first time that I used a lower level game engine. Instead of feature
 ### Windows:
 1. Download from releases
 2. Run main.exe
+
+## AI DISCLOSURE
+**Close to no AI was used to make this project. AI was used to help with pygame documetation, but no AI was directly used for code or assets.**
