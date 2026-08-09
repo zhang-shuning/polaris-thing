@@ -12,9 +12,11 @@ HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
 START_GAME_NAME = "Start Game"
+RESUME_GAME = "Resume Game"
 LEVEL_SELECTOR_NAME = "Level\n Selector"
-RETURN_MENU = "BACK TO \nMAIN MENU"
-QUIT_TEXT = "QUIT GAME"
+RETURN_MENU = "Back To \nMain Menu"
+QUIT_TEXT = "Quit Game"
+escape_loaded = False
 RANGE = 120
 
 #Physics constants
@@ -68,6 +70,7 @@ class ScreenEnum(enum.Enum):
     GAME = enum.auto()
     MAIN_MENU = enum.auto()
     LEVEL_SELECTOR = enum.auto()
+    ESCAPE_MENU = enum.auto()
 
 
 current_screen = ScreenEnum.MAIN_MENU
@@ -223,8 +226,13 @@ while running:
             elif current_screen == ScreenEnum.LEVEL_SELECTOR:
                 if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
+            elif current_screen == ScreenEnum.ESCAPE_MENU:
+                if button_pos_dict[RESUME_GAME].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.GAME
+                elif button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
+                    current_screen = ScreenEnum.MAIN_MENU
 
-            if event.button == 1 and player.in_build:
+            if event.button == 1 and player.in_build and current_screen == ScreenEnum.GAME:
                 mouse_pos = pygame.mouse.get_pos()
                 box_x = mouse_pos[0]//32
                 box_y = mouse_pos[1]//32
@@ -234,16 +242,16 @@ while running:
                     set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
                                             rect=rect, map = "assets/block1.png"))
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                current_screen = ScreenEnum.MAIN_MENU
+            if event.key == pygame.K_ESCAPE and ScreenEnum.GAME:
+                escape_loaded = False
+                current_screen = ScreenEnum.ESCAPE_MENU
             if event.key == pygame.K_b:
                 player.in_build = not player.in_build
 
 
     keys = pygame.key.get_pressed()
     #Clears screen
-    screen.blit(pygame.image.load("assets/background.png"))
-
+    screen.fill((50,50,50))
     match current_screen:
         case ScreenEnum.GAME:
             #In game
@@ -311,11 +319,21 @@ while running:
             #Main menu
             if not menu_loaded:
                 pygame.mouse.set_visible(True)
-                make_button(big_text, START_GAME_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
-                make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/10, VERTICAL_SIZE/10))
+                make_button(big_text, START_GAME_NAME, (HORIZONTAL_SIZE/10, VERTICAL_SIZE/10))
+                make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
                 make_button(big_text, QUIT_TEXT, (HORIZONTAL_SIZE - 80, VERTICAL_SIZE - 20))
                 menu_loaded = True
                 level_selector_loaded = False
+                escape_loaded = False
+                pygame.display.flip()
+        case ScreenEnum.ESCAPE_MENU:
+
+            if not escape_loaded:
+                make_button(big_text, RESUME_GAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
+                make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
+                level_selector_loaded = False
+                menu_loaded = False
+                escape_loaded = True
                 pygame.display.flip()
         case ScreenEnum.LEVEL_SELECTOR:
             if not level_selector_loaded:
@@ -323,4 +341,5 @@ while running:
                 make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
                 level_selector_loaded = True
                 menu_loaded = False
+                escape_loaded = False
                 pygame.display.flip()
