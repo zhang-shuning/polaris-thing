@@ -512,7 +512,8 @@ while running:
             if event.key == pygame.K_s and current_screen == ScreenEnum.GAME and event.mod & pygame.KMOD_CTRL:
                 scripts.map_save.write_map([(surface.map, surface.group, tuple(surface.rect)) for surface in surface_list], map_number)
             if event.key == pygame.K_TAB:
-                player.cheat = not player.cheat
+                pass
+                #player.cheat = not player.cheat
 
     keys = pygame.key.get_pressed()
     #Clears screen
