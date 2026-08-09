@@ -368,6 +368,28 @@ while running:
                                             rect=rect, map = "assets/block1.png", group=2)
                     connect_textures()
                     tile_dict = {}
+            elif event.button == 3 and current_screen == ScreenEnum.GAME:
+                mouse_pos = pygame.mouse.get_pos()
+                box_x = mouse_pos[0]//32
+                box_y = mouse_pos[1]//32
+                
+                rect = pygame.Rect(box_x*32, box_y*32, 32,32)
+                index = rect.collidelist(surface_list)
+                if index != 1:
+                    for surface in surface_list:
+                        if surface.rect == rect:
+                            surface_list.remove(surface)
+                            try:
+                                black_hole_list.remove(surface)
+                            except ValueError:
+                                pass
+                            try:
+                                collider_list.remove(surface)
+                            except ValueError:
+                                pass
+                            connect_textures()
+                            tile_dict = {}
+                            break
             elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
                 create_black_hole(pygame.mouse.get_pos())
 
