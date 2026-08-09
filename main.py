@@ -43,9 +43,8 @@ screen = pygame.display.set_mode((HORIZONTAL_SIZE, VERTICAL_SIZE),vsync=1,flags 
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
-res_list_x = [100,100,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
-res_list_y = [330,300,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
-won_levels = {x:False for x in range(1,10)}
+res_list_x = [100,100,20,20,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_y = [330,300,300,300,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
 
 #Gameplay
 surface_list:list[ScreenSurface] = []
