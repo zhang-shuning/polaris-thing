@@ -271,8 +271,7 @@ while running:
                                             rect=rect, map = "assets/block1.png"))
             elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
                 rect = pygame.Rect(pygame.mouse.get_pos(), (32,32))
-                ScreenSurface(pygame.image.load("assets/temphole.png"),
-                               rect=rect, rect_offset=(8,8), show_hitbox=True)
+                pass
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE and ScreenEnum.GAME:
