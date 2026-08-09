@@ -596,13 +596,14 @@ while running:
             #Main menu
             if not menu_loaded:
                 pygame.mouse.set_visible(True)
-                make_text(medium_text, '''Controls:
-                Jump:up/C
-                Left:left
-                right:right
-                Slow Fall:z
-                Fast Fall:x/down
-                Restart: hold r''', (75, VERTICAL_SIZE-50))
+                make_text(medium_text,
+'''Controls:
+Jump:up/C
+Left:left
+right:right
+Slow Fall:z
+Fast Fall:x/down
+Restart: hold r''', (75, VERTICAL_SIZE-50))
                 make_text(big_text, "CATACLYSMIC HOLES", (HORIZONTAL_SIZE/2, 75))
                 make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
                 make_button(big_text, QUIT_TEXT, (HORIZONTAL_SIZE - 80, VERTICAL_SIZE - 20))
