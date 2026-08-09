@@ -14,7 +14,7 @@ HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
 RESUME_GAME = "Resume Game"
-LEVEL_SELECTOR_NAME = "Level\n Selector"
+LEVEL_SELECTOR_NAME = "\n      Play      \n\n"
 RETURN_MENU = "Back To \nMain Menu"
 QUIT_TEXT = "Quit Game"
 RESET_WINS = "Reset\nwon levels"
@@ -36,6 +36,9 @@ HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
 
+RESPAWN_TIME = .3
+respawn_timer = RESPAWN_TIME
+
 BLACK_HOLE_STRENGTH = 30
 MAX_BLACK_HOLE_ACCELERATION = 10 #Controls max black hole acceleration in a single tick
 BLACK_HOLE_DIST = 128
@@ -45,8 +48,8 @@ screen = pygame.display.set_mode((HORIZONTAL_SIZE, VERTICAL_SIZE),vsync=1,flags 
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
-res_list_x = [100,100,20,20,96,32,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
-res_list_y = [330,300,300,300,0,VERTICAL_SIZE-64,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_x = [100,100,20,20,96,16,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_y = [330,300,300,300,32,VERTICAL_SIZE-80,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
 won_levels = {x:False for x in range(1,10)}
 
 #Gameplay
@@ -513,6 +516,15 @@ while running:
         case ScreenEnum.GAME:
             #In game 
             fps = round(clock.get_fps())
+            if keys[pygame.K_r]:
+                respawn_timer -= delta_time
+            else:
+                respawn_timer = RESPAWN_TIME
+
+            if respawn_timer < 0:
+                player.respawn()
+                respawn_timer = RESPAWN_TIME
+
             if pygame.Rect(player.rect.x, player.rect.y, player.rect.width, player.rect.height).collidelist(collider_list) != -1:
                 player.grounded_timer = 6
             #Horizontal movement
@@ -584,7 +596,14 @@ while running:
             #Main menu
             if not menu_loaded:
                 pygame.mouse.set_visible(True)
-                make_text(medium_text, "Controls:\nJump:up/C\nLeft:left\nright:right\nSlow Fall:z\nFast Fall:x/down", (75, VERTICAL_SIZE-50))
+                make_text(medium_text, '''Controls:
+                Jump:up/C
+                Left:left
+                right:right
+                Slow Fall:z
+                Fast Fall:x/down
+                Restart: hold r''', (75, VERTICAL_SIZE-50))
+                make_text(big_text, "CATACLYSMIC HOLES", (HORIZONTAL_SIZE/2, 75))
                 make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
                 make_button(big_text, QUIT_TEXT, (HORIZONTAL_SIZE - 80, VERTICAL_SIZE - 20))
                 menu_loaded = True
