@@ -17,6 +17,7 @@ RESUME_GAME = "Resume Game"
 LEVEL_SELECTOR_NAME = "Level\n Selector"
 RETURN_MENU = "Back To \nMain Menu"
 QUIT_TEXT = "Quit Game"
+RESET_WINS = "Reset\nwon levels"
 escape_loaded = False
 RANGE = 120
 
@@ -408,6 +409,10 @@ while running:
             elif current_screen == ScreenEnum.LEVEL_SELECTOR:
                 if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
+                elif button_pos_dict[RESET_WINS].collidepoint(pygame.mouse.get_pos()):
+                    level_selector_loaded = False
+                    won_levels = {x:False for x in range(1,10)}
+                    save_wins()
                 for i in range(1, 10):
                     if button_pos_dict[str(i)].collidepoint(pygame.mouse.get_pos()):
                         load_map(i)
@@ -574,6 +579,7 @@ while running:
             if not level_selector_loaded:
                 make_button(big_text, "LEVELS", (HORIZONTAL_SIZE/2, 15))
                 make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
+                make_button(big_text, RESET_WINS, (HORIZONTAL_SIZE-75, VERTICAL_SIZE-20))
                 for i in range(3):
                     for j in range(3):
                         if won_levels[1+j*3+i]:
