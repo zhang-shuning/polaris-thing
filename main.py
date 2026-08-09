@@ -23,11 +23,11 @@ RANGE = 120
 FUZZY_ZERO = 0.001 #Amount where velocity rounds to 0
 HORIZONTAL_ACCELERATION_COEFFICIENT = 30 #Coefficient on acceleration
 GRAVITY = 10 #Coefficient on gravity
-FAST_FALL_COEFFICIENT = 0.2 # Coeficient on fast falling
-INSTANT_JUMP_VELOCITY = 3 # Minimum velocity gained while jumping
-JUMP_HOLD_COEFICIENT = 10 # Coefficient for the speed of holding the jump button after a jump
-JUMP_HOLD_TIME = 0.06 # Amount of seconds  to hold after a jump while getting acceleration
-JUMP_HORIZONTAL_PART = 15 #Coefficient on increased jump height for horizontal velocity
+FAST_FALL_COEFFICIENT = 4 # Coeficient on fast falling
+INSTANT_JUMP_VELOCITY = 4 # Minimum velocity gained while jumping
+JUMP_HOLD_COEFICIENT = 0.0001 # Coefficient for the speed of holding the jump button after a jump
+JUMP_HOLD_TIME = 0.2 # Amount of seconds  to hold after a jump while getting acceleration
+JUMP_HORIZONTAL_PART = 1 #Coefficient on increased jump height for horizontal velocity
 HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
@@ -204,14 +204,15 @@ class Player(ScreenSurface):
         for black_hole in black_hole_list:
             dx = black_hole.rect.centerx - self.x_pos
             dy = black_hole.rect.centery - self.y_pos
-            if dx <= 64 and dy <= 64:
+            if abs(dx) <= 64 and abs(dy) <= 64:
                 dist_sq = dx**2 + dy**2
                 dist = math.sqrt(dist_sq)
-                strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
-                self.x_vel += strength*dx/dist
-                self.y_vel += strength*dy/dist
-                if black_hole.rect.colliderect(self.rect):
-                    self.respawn()
+                if dist < 64:
+                    strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
+                    self.x_vel += strength*dx/dist
+                    self.y_vel += strength*dy/dist
+                    if black_hole.rect.colliderect(self.rect):
+                        self.respawn()
 
     def respawn(self):
         self.y_pos = self.res_y_pos
@@ -431,7 +432,7 @@ while running:
                     player.y_vel = -INSTANT_JUMP_VELOCITY
                 else:
                     #Higher velocity for longer hold and faster horizontal speed
-                    player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time, (delta_time+player.grounded_timer))
+                    player.y_vel -= JUMP_HOLD_COEFICIENT + player.grounded_timer
                     player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
             #X axis air resistance
             player.x_vel *= HORIZONTAL_AIR_RESISTANCE
