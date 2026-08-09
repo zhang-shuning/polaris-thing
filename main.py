@@ -49,8 +49,8 @@ screen = pygame.display.set_mode((HORIZONTAL_SIZE, VERTICAL_SIZE),vsync=1,flags 
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
-res_list_x = [100,100,20,20,96,16,32,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
-res_list_y = [330,300,300,300,32,VERTICAL_SIZE-80,48,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_x = [100,100,20,20,96,16,32,0,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_y = [330,300,300,300,32,VERTICAL_SIZE-80,48,VERTICAL_SIZE-48,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
 won_levels = {x:False for x in range(1,10)}
 
 #Gameplay
@@ -284,6 +284,7 @@ class Player(ScreenSurface):
                     if black_hole.rect.colliderect(self.rect):
                         won_levels[map_number] = True
                         save_wins()
+                        self.respawn()
                         return True
         return False
 
