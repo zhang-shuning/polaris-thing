@@ -109,6 +109,7 @@ class ScreenSurface():
         self.show_hitbox = show_hitbox
         self.rect_offset = rect_offset
         self.map = map
+        self.group = group
         if group == 1:
             set_surface(self)
         elif group == 2:
@@ -277,8 +278,8 @@ while running:
                 
                 rect = pygame.Rect(box_x*32, box_y*32, 32,32)
                 if not any(rect == collider.rect for collider in collider_list):
-                    set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
-                                            rect=rect, map = "assets/block1.png"))
+                    ScreenSurface(surface=pygame.image.load("assets/block1.png"),
+                                            rect=rect, map = "assets/block1.png", group=2)
             elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
                 rect = pygame.Rect(pygame.mouse.get_pos(), (32,32))
                 pass
