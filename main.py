@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import override
 from sys import exit
 import enum
+import math
 import pygame
 from pygame.typing import Point
 
@@ -14,7 +15,7 @@ START_GAME_NAME = "Start Game"
 LEVEL_SELECTOR_NAME = "Level\n Selector"
 RETURN_MENU = "BACK TO \nMAIN MENU"
 QUIT_TEXT = "QUIT GAME"
-
+RANGE = 120
 
 #Physics constants
 #Most of these are multiplied by frametime * 60/1000
@@ -30,7 +31,7 @@ HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
 
-
+BLACK_HOLE_STRENGTH = .5
 
 running = True
 pygame.init()
@@ -42,6 +43,7 @@ clock = pygame.time.Clock()
 #Gameplay
 surface_list:list[ScreenSurface] = []
 collider_list:list[ScreenSurface] = []
+black_hole_list:list[ScreenSurface] = []
 screen_offset:int = 0
 screen_end:int = HORIZONTAL_SIZE
 
@@ -77,6 +79,11 @@ def set_collider(ss:ScreenSurface):
 
 def set_surface(ss:ScreenSurface):
     '''Sets the ss to a surface'''
+    surface_list.append(ss)
+
+def set_black_hole(ss:ScreenSurface):
+    '''Sets the ss to be a blakc hole'''
+    black_hole_list.append(ss)
     surface_list.append(ss)
 
 class ScreenSurface():
@@ -175,6 +182,12 @@ class Player(ScreenSurface):
         self.rect.y = round(self.y_pos)
         self.check_y_collisions()
 
+    def handle_black_hole(self):
+        #Find euclidean distance to black holes
+        for black_hole in black_hole_list:
+            self.x_vel += BLACK_HOLE_STRENGTH/math.copysign((black_hole.rect.x - self.x_pos)**2, + black_hole.rect.x - self.x_pos)
+            self.y_vel += BLACK_HOLE_STRENGTH/math.copysign((black_hole.rect.y - self.y_pos)**2, + black_hole.rect.y - self.y_pos)
+
 def load_map(number):
     collider_list.clear()
     surface_list.clear()
@@ -187,6 +200,9 @@ def load_map(number):
 
 player = Player(surface=pygame.image.load("assets/block1.png"),
                 rect=pygame.Rect((0, 0), (32,32)))
+
+black_hole_test = ScreenSurface(pygame.image.load("assets/temp-hole-pixilart.png"), rect=pygame.Rect(200,200,32,32), show_hitbox=True)
+set_black_hole(black_hole_test)
 
 while running:
     delta_time = clock.tick(60)*3/50
@@ -247,7 +263,6 @@ while running:
                     player.y_vel = -INSTANT_JUMP_VELOCITY
                 else:
                     #Higher velocity for longer hold and faster horizontal speed
-                    print(delta_time, (delta_time+player.grounded_timer), player.grounded_timer)
                     player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time, (delta_time+player.grounded_timer))
                     player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
             #X axis air resistance
@@ -257,6 +272,7 @@ while running:
                 player.x_vel = 0
             if abs(player.y_vel) < FUZZY_ZERO:
                 player.y_vel = 0
+            player.handle_black_hole()
             #Player moves
             player.move()
             if player.grounded_timer < 0:
