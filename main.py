@@ -41,6 +41,8 @@ screen = pygame.display.set_mode((HORIZONTAL_SIZE, VERTICAL_SIZE),vsync=1,flags 
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
+res_list_x = [200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_y = [200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
 
 #Gameplay
 surface_list:list[ScreenSurface] = []
@@ -229,6 +231,8 @@ def load_map(number):
     collider_list.clear()
     surface_list.clear()
     black_hole_list.clear()
+    player.res_x_pos = res_list_x[number-1]
+    player.res_y_pos = res_list_y[number-1]
     maps = scripts.map_save.read_map(number)
     try:
         if maps is not None:
