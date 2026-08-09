@@ -34,7 +34,7 @@ WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
 
 BLACK_HOLE_STRENGTH = 30
 MAX_BLACK_HOLE_ACCELERATION = 10 #Controls max black hole acceleration in a single tick
-
+BLACK_HOLE_DIST = 128
 running = True
 pygame.init()
 screen = pygame.display.set_mode((HORIZONTAL_SIZE, VERTICAL_SIZE),vsync=1,flags = pygame.FULLSCREEN|pygame.SCALED)
@@ -214,10 +214,10 @@ class Player(ScreenSurface):
         for black_hole in black_hole_list:
             dx = black_hole.rect.centerx - self.rect.centerx
             dy = black_hole.rect.centery - self.rect.centery
-            if abs(dx) <= 64 and abs(dy) <= 64:
+            if abs(dx) <= BLACK_HOLE_DIST and abs(dy) <= BLACK_HOLE_DIST:
                 dist_sq = dx**2 + dy**2
                 dist = math.sqrt(dist_sq)
-                if dist < 64:
+                if dist < BLACK_HOLE_DIST:
                     strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
                     self.x_vel += strength*dx/dist
                     self.y_vel += strength*dy/dist
