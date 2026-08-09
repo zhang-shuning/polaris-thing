@@ -239,7 +239,7 @@ def load_map(number):
 
 
 player = Player(surface=pygame.image.load("assets/player.png"),
-                rect=pygame.Rect((0, 0), (32,32)))
+                rect=pygame.Rect((0, 0), (28, 28)), rect_offset=(2, 2))
 tile_dict = {}
 tile_size = (32,32)
 def temp():
