@@ -33,8 +33,8 @@ HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
 
-BLACK_HOLE_STRENGTH = 10
-MAX_BLACK_HOLE_ACCELERATION = .01 #Controls max black hole acceleration in a single tick
+BLACK_HOLE_STRENGTH = 30
+MAX_BLACK_HOLE_ACCELERATION = 5 #Controls max black hole acceleration in a single tick
 
 running = True
 pygame.init()
@@ -189,16 +189,13 @@ class Player(ScreenSurface):
     def handle_black_hole(self):
         #Vectors because surely that will help
         for black_hole in black_hole_list:
-            vec = math.sqrt((black_hole.rect.x - self.x_pos)**2 + (black_hole.rect.y - self.y_pos)**2)
-            theta = math.atan2(black_hole.rect.x - self.x_pos, black_hole.rect.y - self.y_pos)
-            distx = vec*math.sin(math.atan2(black_hole.rect.x - self.x_pos, black_hole.rect.y - self.y_pos))
-            disty = vec*math.cos(math.atan2(black_hole.rect.x - self.x_pos, black_hole.rect.y - self.y_pos))
-            strength = BLACK_HOLE_STRENGTH/vec
-            print(strength)
-            if strength > MAX_BLACK_HOLE_ACCELERATION:
-                strength = MAX_BLACK_HOLE_ACCELERATION
-            self.x_vel += strength/(distx)
-            self.y_vel -= strength/(disty)
+            dx = black_hole.rect.centerx - self.x_pos
+            dy = black_hole.rect.centery - self.y_pos
+            dist_sq = dx**2 + dy**2
+            dist = math.sqrt(dist_sq)
+            strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
+            self.x_vel += strength*dx/dist
+            self.y_vel += strength*dy/dist
             if black_hole.rect.colliderect(self.rect):
                 self.respawn()
 
