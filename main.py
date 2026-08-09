@@ -13,11 +13,12 @@ import scripts.map_save
 HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
-RESUME_GAME = "Resume Game"
+RESUME_GAME = "    \nResume Game\n    "
 LEVEL_SELECTOR_NAME = "\n      Play      \n\n"
+MAIN_MENU = "      \nMain Menu\n      "
 RETURN_MENU = "Back To \nMain Menu"
-QUIT_TEXT = "Quit Game"
-RESET_WINS = "Reset\nwon levels"
+QUIT_TEXT = "  Quit Game  "
+RESET_WINS = "    Reset\n    levels    "
 escape_loaded = False
 RANGE = 120
 
@@ -48,8 +49,8 @@ screen = pygame.display.set_mode((HORIZONTAL_SIZE, VERTICAL_SIZE),vsync=1,flags 
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
-res_list_x = [100,100,20,20,96,16,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
-res_list_y = [330,300,300,300,32,VERTICAL_SIZE-80,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_x = [100,100,20,20,96,16,32,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_y = [330,300,300,300,32,VERTICAL_SIZE-80,48,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
 won_levels = {x:False for x in range(1,10)}
 
 #Gameplay
@@ -446,7 +447,7 @@ while running:
             elif current_screen == ScreenEnum.ESCAPE_MENU:
                 if button_pos_dict[RESUME_GAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.GAME
-                elif button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
+                elif button_pos_dict[MAIN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
                     map_number = -1
             if player.cheat == True:
@@ -588,7 +589,7 @@ while running:
             #    pygame.draw.line(screen, (255,255,255),(i*32,0),(i*32,VERTICAL_SIZE))
             #for n in range(VERTICAL_SIZE//32 + 1):
             #    pygame.draw.line(screen, (255,255,255),(0,n*32),(HORIZONTAL_SIZE,n*32))
-            make_button(big_text,f'{fps}',(HORIZONTAL_SIZE-20,20))
+            make_text(big_text,f'{fps}',(HORIZONTAL_SIZE-20,20))
             #updates the screen
             pygame.display.flip()
             menu_loaded = False
@@ -615,8 +616,8 @@ Restart: hold r''', (75, VERTICAL_SIZE-50))
         case ScreenEnum.ESCAPE_MENU:
 
             if not escape_loaded:
-                make_button(big_text, RESUME_GAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
-                make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
+                make_button(big_text, RESUME_GAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/3))
+                make_button(big_text, MAIN_MENU, (HORIZONTAL_SIZE/2, 2*VERTICAL_SIZE/3))
                 level_selector_loaded = False
                 menu_loaded = False
                 escape_loaded = True
@@ -625,7 +626,7 @@ Restart: hold r''', (75, VERTICAL_SIZE-50))
         case ScreenEnum.LEVEL_SELECTOR:
             load_wins()
             if not level_selector_loaded:
-                make_button(big_text, "LEVELS", (HORIZONTAL_SIZE/2, 15))
+                make_text(big_text, "LEVELS", (HORIZONTAL_SIZE/2, 15))
                 make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
                 make_button(big_text, RESET_WINS, (HORIZONTAL_SIZE-75, VERTICAL_SIZE-20))
                 for i in range(3):
