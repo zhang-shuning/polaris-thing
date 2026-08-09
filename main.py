@@ -363,7 +363,7 @@ while running:
 
     keys = pygame.key.get_pressed()
     #Clears screen
-    screen.fill((50,50,50))
+    screen.blit(pygame.image.load('assets/background.png'))
     match current_screen:
         case ScreenEnum.GAME:
             #In game
