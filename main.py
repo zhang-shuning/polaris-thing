@@ -204,8 +204,8 @@ class Player(ScreenSurface):
     def handle_black_hole(self):
         #Vectors because surely that will help
         for black_hole in black_hole_list:
-            dx = black_hole.rect.centerx - self.x_pos
-            dy = black_hole.rect.centery - self.y_pos
+            dx = black_hole.rect.centerx - self.rect.centerx
+            dy = black_hole.rect.centery - self.rect.centery
             if abs(dx) <= 64 and abs(dy) <= 64:
                 dist_sq = dx**2 + dy**2
                 dist = math.sqrt(dist_sq)
@@ -389,11 +389,12 @@ while running:
                 index = rect.collidelist(surface_list)
                 if index != 1:
                     for surface in surface_list:
-                        if surface.rect == rect:
-                            surface_list.remove(surface)
+                        if surface.rect.collidepoint(mouse_pos):
+                            surface_list.remove(surface)   
                             try:
                                 black_hole_list.remove(surface)
                             except ValueError:
+                                
                                 pass
                             try:
                                 collider_list.remove(surface)
