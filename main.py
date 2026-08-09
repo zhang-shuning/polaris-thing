@@ -74,6 +74,11 @@ def make_button(font:pygame.Font, text:str, position:tuple[int], text_color = (2
     if text not in button_pos_dict:
         button_pos_dict[text] = font_rect
 
+def make_text(font:pygame.Font, text:str, position:tuple[int], text_color = (255, 255, 255)) -> None:
+    rendered_font = font.render(text, True, text_color)
+    font_rect = rendered_font.get_rect(center = position)
+    screen.blit(rendered_font, font_rect)
+
 class ScreenEnum(enum.Enum):
     GAME = enum.auto()
     MAIN_MENU = enum.auto()
@@ -579,6 +584,7 @@ while running:
             #Main menu
             if not menu_loaded:
                 pygame.mouse.set_visible(True)
+                make_text(medium_text, "Controls:\nJump:up/C\nLeft:left\nright:right\nSlow Fall:z\nFast Fall:x/down", (75, VERTICAL_SIZE-50))
                 make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
                 make_button(big_text, QUIT_TEXT, (HORIZONTAL_SIZE - 80, VERTICAL_SIZE - 20))
                 menu_loaded = True
