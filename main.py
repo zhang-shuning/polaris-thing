@@ -26,7 +26,8 @@ RANGE = 120
 FUZZY_ZERO = 0.001 #Amount where velocity rounds to 0
 HORIZONTAL_ACCELERATION_COEFFICIENT = 30 #Coefficient on acceleration
 GRAVITY = 10 #Coefficient on gravity
-FAST_FALL_COEFFICIENT = 4 # Coeficient on fast falling
+FAST_FALL_COEFFICIENT = 6 # Coeficient on fast falling
+SLOW_FALL_COEFFICIENT = 4
 INSTANT_JUMP_VELOCITY = 4 # Minimum velocity gained while jumping
 JUMP_HOLD_COEFICIENT = 0.0001 # Coefficient for the speed of holding the jump button after a jump
 JUMP_HOLD_TIME = 0.2 # Amount of seconds  to hold after a jump while getting acceleration
@@ -497,7 +498,7 @@ while running:
                 player.in_build = not player.in_build
             if event.key == pygame.K_s and current_screen == ScreenEnum.GAME and event.mod & pygame.KMOD_CTRL:
                 scripts.map_save.write_map([(surface.map, surface.group, tuple(surface.rect)) for surface in surface_list], map_number)
-            if event.key == pygame.K_c:
+            if event.key == pygame.K_TAB:
                 player.cheat = not player.cheat
 
     keys = pygame.key.get_pressed()
@@ -515,10 +516,13 @@ while running:
             #Gravity
             player.y_vel += delta_time*GRAVITY
             #Fast fall
-            if not keys[pygame.K_UP]:
-                player.y_vel += keys[pygame.K_DOWN] * delta_time * abs(FAST_FALL_COEFFICIENT)
+            if not keys[pygame.K_z] and keys[pygame.K_x] | keys[pygame.K_DOWN]:
+                player.y_vel += delta_time * FAST_FALL_COEFFICIENT
+            #Slow fall
+            if not keys[pygame.K_x] | keys[pygame.K_DOWN] and player.y_vel>0:
+                player.y_vel -= keys[pygame.K_z] * delta_time * SLOW_FALL_COEFFICIENT
             #Jumping
-            if player.grounded and keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
+            if player.grounded and keys[pygame.K_UP] | keys[pygame.K_c] and not keys[pygame.K_DOWN]:
                 #Minimum jump velocity
                 if player.y_vel > 0:
                     player.y_vel = -INSTANT_JUMP_VELOCITY
