@@ -197,8 +197,8 @@ class Player(ScreenSurface):
             print(strength)
             if strength > MAX_BLACK_HOLE_ACCELERATION:
                 strength = MAX_BLACK_HOLE_ACCELERATION
-            self.x_vel += strength/(distx*math.sin(theta))
-            self.y_vel -= strength/(disty*math.cos(theta))
+            self.x_vel += strength/(distx)
+            self.y_vel -= strength/(disty)
             if black_hole.rect.colliderect(self.rect):
                 self.respawn()
 
