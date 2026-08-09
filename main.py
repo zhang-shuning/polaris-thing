@@ -181,7 +181,7 @@ class Player(ScreenSurface):
         self.first:bool = True
         self.bh_lim:int = 10
         self.bh_cur:int = 0
-
+        self.cheat:bool = False
     def check_x_collisions(self):
         #Check collisions, if collided, set x position to the x
         #Can be put into smaller steps if going through walls becomes an issue
@@ -425,48 +425,50 @@ while running:
                 elif button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
                     map_number = -1
-            if player.first:
-                player.first = False
-            elif event.button == 1 and player.in_build and current_screen == ScreenEnum.GAME:
-                mouse_pos = pygame.mouse.get_pos()
-                box_x = mouse_pos[0]//32
-                box_y = mouse_pos[1]//32
-                
-                rect = pygame.Rect(box_x*32, box_y*32, 32,32)
-                if not any(rect == collider.rect for collider in collider_list):
-                    ScreenSurface(surface=pygame.image.load("assets/block1.png"),
-                                            rect=rect, map = "assets/block1.png", group=2)
-                    connect_textures()
-                    tile_dict = {}
-            elif event.button == 3 and current_screen == ScreenEnum.GAME:
-                mouse_pos = pygame.mouse.get_pos()
-                box_x = mouse_pos[0]//32
-                box_y = mouse_pos[1]//32
-                
-                rect = pygame.Rect(box_x*32, box_y*32, 32,32)
-                index = rect.collidelist(surface_list)
-                if index != 1:
-                    for surface in surface_list:
-                        if surface.rect.collidepoint(mouse_pos):
-                            surface_list.remove(surface)   
-                            try:
-                                black_hole_list.remove(surface)
-                                white_hole_list.remove(surface)
-                            except ValueError:
-                                
-                                pass
-                            try:
-                                collider_list.remove(surface)
-                            except ValueError:
-                                pass
-                            connect_textures()
-                            tile_dict = {}
-                            break
-            elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
-                create_black_hole(pygame.mouse.get_pos())
-            elif event.button == 2 and not player.in_build and current_screen == ScreenEnum.GAME:
-                create_white_hole(pygame.mouse.get_pos())
-                print("hi")
+            if player.cheat == True:
+                pass
+                if player.first:
+                    player.first = False
+                elif event.button == 1 and player.in_build and current_screen == ScreenEnum.GAME:
+                    mouse_pos = pygame.mouse.get_pos()
+                    box_x = mouse_pos[0]//32
+                    box_y = mouse_pos[1]//32
+                    
+                    rect = pygame.Rect(box_x*32, box_y*32, 32,32)
+                    if not any(rect == collider.rect for collider in collider_list):
+                        ScreenSurface(surface=pygame.image.load("assets/block1.png"),
+                                                rect=rect, map = "assets/block1.png", group=2)
+                        connect_textures()
+                        tile_dict = {}
+                elif event.button == 3 and current_screen == ScreenEnum.GAME:
+                    mouse_pos = pygame.mouse.get_pos()
+                    box_x = mouse_pos[0]//32
+                    box_y = mouse_pos[1]//32
+                    
+                    rect = pygame.Rect(box_x*32, box_y*32, 32,32)
+                    index = rect.collidelist(surface_list)
+                    if index != 1:
+                        for surface in surface_list:
+                            if surface.rect.collidepoint(mouse_pos):
+                                surface_list.remove(surface)   
+                                try:
+                                    black_hole_list.remove(surface)
+                                    white_hole_list.remove(surface)
+                                except ValueError:
+                                    
+                                    pass
+                                try:
+                                    collider_list.remove(surface)
+                                except ValueError:
+                                    pass
+                                connect_textures()
+                                tile_dict = {}
+                                break
+                elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
+                    create_black_hole(pygame.mouse.get_pos())
+                elif event.button == 2 and not player.in_build and current_screen == ScreenEnum.GAME:
+                    create_white_hole(pygame.mouse.get_pos())
+                    print("hi")
             
 
         if event.type == pygame.KEYDOWN:
@@ -477,7 +479,8 @@ while running:
                 player.in_build = not player.in_build
             if event.key == pygame.K_s and current_screen == ScreenEnum.GAME and event.mod & pygame.KMOD_CTRL:
                 scripts.map_save.write_map([(surface.map, surface.group, tuple(surface.rect)) for surface in surface_list], map_number)
-
+            if event.key == pygame.K_c:
+                player.cheat = not player.cheat
 
     keys = pygame.key.get_pressed()
     #Clears screen
