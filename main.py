@@ -48,6 +48,7 @@ res_list_y = [200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,20
 surface_list:list[ScreenSurface] = []
 collider_list:list[ScreenSurface] = []
 black_hole_list:list[ScreenSurface] = []
+white_hole_list:list[ScreenSurface] = []
 screen_offset:int = 0
 screen_end:int = HORIZONTAL_SIZE
 
@@ -91,6 +92,11 @@ def set_black_hole(ss:ScreenSurface):
     black_hole_list.append(ss)
     surface_list.append(ss)
 
+def set_white_hole(ss:ScreenSurface):
+    '''Sets the ss to be a blakc hole'''
+    white_hole_list.append(ss)
+    surface_list.append(ss)
+
 class ScreenSurface():
     '''
     A surface that gets drawn onto the screen while the state is the game
@@ -116,6 +122,8 @@ class ScreenSurface():
             set_collider(self)
         elif group == 3:
             set_black_hole(self)
+        elif group == 4:
+            set_white_hole(self)
 
     def draw(self):
         '''Draws onto the screen'''
@@ -216,6 +224,23 @@ class Player(ScreenSurface):
                     if black_hole.rect.colliderect(self.rect):
                         self.respawn()
 
+    #Victory
+    def handle_white_hole(self):
+        global current_screen
+        #Vectors because surely that will help
+        for black_hole in white_hole_list:
+            dx = black_hole.rect.centerx - self.x_pos
+            dy = black_hole.rect.centery - self.y_pos
+            if abs(dx) <= 64 and abs(dy) <= 64:
+                dist_sq = dx**2 + dy**2
+                dist = math.sqrt(dist_sq)
+                if dist < 64:
+                    strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
+                    self.x_vel += strength*dx/dist
+                    self.y_vel += strength*dy/dist
+                    if black_hole.rect.colliderect(self.rect):
+                        current_screen = ScreenEnum.MAIN_MENU
+
     def respawn(self):
         self.y_pos = self.res_y_pos
         self.x_pos = self.res_x_pos
@@ -226,11 +251,16 @@ def create_black_hole(coordinates:tuple[int, int], show_hitbox = False):
     black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"),
                                      rect=pygame.Rect((coordinates), (8, 8)), map="assets/temphole.png",
                                      rect_offset=(12,12), show_hitbox=show_hitbox, group=3)
+def create_white_hole(coordinates:tuple[int, int], show_hitbox = False):
+    black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"),
+                                     rect=pygame.Rect((coordinates), (8, 8)), map="assets/temphole.png",
+                                     rect_offset=(12,12), show_hitbox=show_hitbox, group=4)   
 
 def load_map(number):
     collider_list.clear()
     surface_list.clear()
     black_hole_list.clear()
+    white_hole_list.clear()
     player.res_x_pos = res_list_x[number-1]
     player.res_y_pos = res_list_y[number-1]
     maps = scripts.map_save.read_map(number)
@@ -393,6 +423,7 @@ while running:
                             surface_list.remove(surface)   
                             try:
                                 black_hole_list.remove(surface)
+                                white_hole_list.remove(surface)
                             except ValueError:
                                 
                                 pass
@@ -405,6 +436,10 @@ while running:
                             break
             elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
                 create_black_hole(pygame.mouse.get_pos())
+            elif event.button == 2 and not player.in_build and current_screen == ScreenEnum.GAME:
+                create_white_hole(pygame.mouse.get_pos())
+                print("hi")
+            
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE and current_screen == ScreenEnum.GAME:
@@ -451,6 +486,7 @@ while running:
             if abs(player.y_vel) < FUZZY_ZERO:
                 player.y_vel = 0
             player.handle_black_hole()
+            player.handle_white_hole()
             #Player moves
             player.move()
             if player.grounded_timer < 0:
