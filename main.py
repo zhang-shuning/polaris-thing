@@ -58,6 +58,7 @@ button_pos_dict:dict[str, pygame.Rect] = {}
 small_text = pygame.font.Font(size=12)
 medium_text = pygame.font.Font()
 big_text = pygame.font.Font(size=36)
+map_number = -1
 
 def make_button(font:pygame.Font, text:str, position:tuple[int], text_color = (255, 255, 255), rectangle_color = (0, 0, 0)) -> None:
     rendered_font = font.render(text, True, text_color)
@@ -149,6 +150,7 @@ class Player(ScreenSurface):
         self.grounded:bool = False
         self.grounded_timer:float = 0
         self.in_build:bool = True
+        self.first:bool = True
 
     def check_x_collisions(self):
         #Check collisions, if collided, set x position to the x
@@ -217,8 +219,9 @@ class Player(ScreenSurface):
         self.y_vel = 0
 
 def create_black_hole(coordinates:tuple[int, int], show_hitbox = False):
-    black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"), rect=pygame.Rect((coordinates), (8, 8)), rect_offset=(12,12), show_hitbox=show_hitbox)
-    set_black_hole(black_hole_test)
+    black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"),
+                                     rect=pygame.Rect((coordinates), (8, 8)), map="assets/temphole.png",
+                                     rect_offset=(12,12), show_hitbox=show_hitbox, group=3)
 
 def load_map(number):
     collider_list.clear()
@@ -230,7 +233,7 @@ def load_map(number):
     try:
         if maps is not None:
             for i in maps:
-                set_collider(ScreenSurface(pygame.image.load(i[0]), rect = pygame.Rect(i[1])))
+                ScreenSurface(pygame.image.load(i[0]), group=i[1], rect = pygame.Rect(i[2]), map=i[0])
         else:
             print("That map does not exist")
     except ValueError:
@@ -346,14 +349,17 @@ while running:
                     if button_pos_dict[str(i)].collidepoint(pygame.mouse.get_pos()):
                         load_map(i)
                         current_screen = ScreenEnum.GAME
+                        map_number = i
                         break
             elif current_screen == ScreenEnum.ESCAPE_MENU:
                 if button_pos_dict[RESUME_GAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.GAME
                 elif button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
-
-            if event.button == 1 and player.in_build and current_screen == ScreenEnum.GAME:
+                    map_number = -1
+            if player.first:
+                player.first = False
+            elif event.button == 1 and player.in_build and current_screen == ScreenEnum.GAME:
                 mouse_pos = pygame.mouse.get_pos()
                 box_x = mouse_pos[0]//32
                 box_y = mouse_pos[1]//32
@@ -373,6 +379,8 @@ while running:
                 current_screen = ScreenEnum.ESCAPE_MENU
             if event.key == pygame.K_b:
                 player.in_build = not player.in_build
+            if event.key == pygame.K_s and current_screen == ScreenEnum.GAME and event.mod & pygame.KMOD_CTRL:
+                scripts.map_save.write_map([(surface.map, surface.group, tuple(surface.rect)) for surface in surface_list], map_number)
 
 
     keys = pygame.key.get_pressed()
@@ -446,6 +454,7 @@ while running:
                 menu_loaded = True
                 level_selector_loaded = False
                 escape_loaded = False
+                player.first = True
                 pygame.display.flip()
         case ScreenEnum.ESCAPE_MENU:
 
@@ -455,6 +464,7 @@ while running:
                 level_selector_loaded = False
                 menu_loaded = False
                 escape_loaded = True
+                player.first = True
                 pygame.display.flip()
         case ScreenEnum.LEVEL_SELECTOR:
             if not level_selector_loaded:
@@ -466,4 +476,6 @@ while running:
                 level_selector_loaded = True
                 menu_loaded = False
                 escape_loaded = False
+                player.first = True
                 pygame.display.flip()
+
