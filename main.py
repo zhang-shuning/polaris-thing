@@ -21,13 +21,13 @@ RANGE = 120
 #Physics constants
 #Most of these are multiplied by frametime * 60/1000
 FUZZY_ZERO = 0.001 #Amount where velocity rounds to 0
-HORIZONTAL_ACCELERATION_COEFFICIENT = .2 #Coefficient on acceleration
-GRAVITY = 0.1 #Coefficient on gravity
+HORIZONTAL_ACCELERATION_COEFFICIENT = 30 #Coefficient on acceleration
+GRAVITY = 10 #Coefficient on gravity
 FAST_FALL_COEFFICIENT = 0.2 # Coeficient on fast falling
-INSTANT_JUMP_VELOCITY = 2.5 # Minimum velocity gained while jumping
-JUMP_HOLD_COEFICIENT = .3 # Coefficient for the speed of holding the jump button after a jump
-JUMP_HOLD_TIME = 6 # Amount of seconds *60/1000 to hold after a jump while getting acceleration
-JUMP_HORIZONTAL_PART = .05 #Coefficient on increased jump height for horizontal velocity
+INSTANT_JUMP_VELOCITY = 3 # Minimum velocity gained while jumping
+JUMP_HOLD_COEFICIENT = 10 # Coefficient for the speed of holding the jump button after a jump
+JUMP_HOLD_TIME = 0.06 # Amount of seconds *60/1000 to hold after a jump while getting acceleration
+JUMP_HORIZONTAL_PART = 15 #Coefficient on increased jump height for horizontal velocity
 HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
@@ -48,8 +48,6 @@ collider_list:list[ScreenSurface] = []
 black_hole_list:list[ScreenSurface] = []
 screen_offset:int = 0
 screen_end:int = HORIZONTAL_SIZE
-res_x_list = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-res_y_list = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 #Menus
 menu_loaded:bool = False
@@ -145,8 +143,8 @@ class Player(ScreenSurface):
         self.y_vel:float = 0
         self.x_pos:float = rect.x
         self.y_pos:float = rect.x
-        self.res_y_pos = 100
-        self.res_x_pos = 100
+        self.res_y_pos = 200
+        self.res_x_pos = 200
         self.grounded:bool = False
         self.grounded_timer:float = 0
         self.in_build:bool = True
@@ -227,13 +225,13 @@ def load_map(number):
     collider_list.clear()
     surface_list.clear()
     black_hole_list.clear()
-    player.res_x_pos = res_x_list[number]
-    player.res_y_pos = res_y_list[number]
     maps = scripts.map_save.read_map(number)
     try:
         if maps is not None:
             for i in maps:
                 ScreenSurface(pygame.image.load(i[0]), group=i[1], rect = pygame.Rect(i[2]), map=i[0])
+            connect_textures()
+            tile_dict = {}
         else:
             print("That map does not exist")
     except ValueError:
@@ -242,10 +240,10 @@ def load_map(number):
 
 player = Player(surface=pygame.image.load("assets/player.png"),
                 rect=pygame.Rect((0, 0), (28, 28)), rect_offset=(2, 2))
-tile_dict = {}
+
 tile_size = (32,32)
 def connect_textures():
-    
+    tile_dict = {}
     for ss in collider_list:
         tile_dict[str(ss.rect.topleft)] = ss
     for ss in collider_list:
@@ -329,7 +327,7 @@ def connect_textures():
 
 
 while running:
-    delta_time = clock.tick(60)*3/50
+    delta_time = clock.tick(60)/1000
     player.grounded_timer -= delta_time
     # event queue
     for event in pygame.event.get():
@@ -388,11 +386,14 @@ while running:
     screen.blit(pygame.image.load('assets/background.png'))
     match current_screen:
         case ScreenEnum.GAME:
-            #In game
+            #In game 
+            fps = round(clock.get_fps())
+            make_button(big_text,f'{fps}',(200,50))
             if pygame.Rect(player.rect.x, player.rect.y, player.rect.width, player.rect.height).collidelist(collider_list) != -1:
                 player.grounded_timer = 6
             #Horizontal movement
             player.x_vel += delta_time*HORIZONTAL_ACCELERATION_COEFFICIENT*(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])
+            
             #Gravity
             player.y_vel += delta_time*GRAVITY
             #Fast fall
@@ -408,8 +409,8 @@ while running:
                     player.y_vel -= JUMP_HOLD_COEFICIENT * min(delta_time, (delta_time+player.grounded_timer))
                     player.y_vel -= JUMP_HORIZONTAL_PART * delta_time * abs(player.x_vel)
             #X axis air resistance
-            player.x_vel *= delta_time * HORIZONTAL_AIR_RESISTANCE
-            player.x_vel *= delta_time * HORIZONTAL_AIR_RESISTANCE
+            player.x_vel *= HORIZONTAL_AIR_RESISTANCE
+            player.x_vel *= HORIZONTAL_AIR_RESISTANCE
             if abs(player.x_vel) < FUZZY_ZERO:
                 player.x_vel = 0
             if abs(player.y_vel) < FUZZY_ZERO:
@@ -422,10 +423,10 @@ while running:
             #Offset is updated and everything is drawn
             relative_screen_distance = player.x_pos - screen_offset
             #Scroll right
-            if relative_screen_distance > HORIZONTAL_SIZE//2:
-                screen_offset = player.x_pos - HORIZONTAL_SIZE//2
-                if screen_offset > screen_end:
-                    screen_offset = screen_end
+            #if relative_screen_distance > HORIZONTAL_SIZE//2:
+                #screen_offset = player.x_pos - HORIZONTAL_SIZE//2
+                #if screen_offset > screen_end:
+                    #screen_offset = screen_end
             #Scroll left
             if relative_screen_distance < HORIZONTAL_SIZE//3:
                 screen_offset = player.x_pos - HORIZONTAL_SIZE//3
