@@ -58,6 +58,7 @@ button_pos_dict:dict[str, pygame.Rect] = {}
 small_text = pygame.font.Font(size=12)
 medium_text = pygame.font.Font()
 big_text = pygame.font.Font(size=36)
+map_number = -1
 
 def make_button(font:pygame.Font, text:str, position:tuple[int], text_color = (255, 255, 255), rectangle_color = (0, 0, 0)) -> None:
     rendered_font = font.render(text, True, text_color)
@@ -217,8 +218,9 @@ class Player(ScreenSurface):
         self.y_vel = 0
 
 def create_black_hole(coordinates:tuple[int, int], show_hitbox = False):
-    black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"), rect=pygame.Rect((coordinates), (8, 8)), rect_offset=(12,12), show_hitbox=show_hitbox)
-    set_black_hole(black_hole_test)
+    black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"),
+                                     rect=pygame.Rect((coordinates), (8, 8)),
+                                     rect_offset=(12,12), show_hitbox=show_hitbox, group=3)
 
 def load_map(number):
     collider_list.clear()
@@ -330,12 +332,14 @@ while running:
                     if button_pos_dict[str(i)].collidepoint(pygame.mouse.get_pos()):
                         load_map(i)
                         current_screen = ScreenEnum.GAME
+                        map_number = i
                         break
             elif current_screen == ScreenEnum.ESCAPE_MENU:
                 if button_pos_dict[RESUME_GAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.GAME
                 elif button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
+                    map_number = -1
 
             if event.button == 1 and player.in_build and current_screen == ScreenEnum.GAME:
                 mouse_pos = pygame.mouse.get_pos()
@@ -356,6 +360,8 @@ while running:
                 current_screen = ScreenEnum.ESCAPE_MENU
             if event.key == pygame.K_b:
                 player.in_build = not player.in_build
+            if event.key == pygame.K_s and current_screen == ScreenEnum.GAME and event.mod & pygame.KMOD_CTRL:
+                scripts.map_save.write_map(surface_list, map_number)
 
 
     keys = pygame.key.get_pressed()
