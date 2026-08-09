@@ -8,5 +8,5 @@ SAVE_FOLDER_PATH = pathlib.Path("../settings")
 CONTROLS_PATH = SAVE_FOLDER_PATH / "controls"
 
 def ensure_save_folder_exists():
-    SAVE_FOLDER_PATH.touch()
+    pathlib.Path.mkdir(SAVE_FOLDER_PATH, exist_ok=True)
 

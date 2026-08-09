@@ -3,6 +3,8 @@ from typing import override, overload
 from sys import exit
 import enum
 import math
+import json
+import pathlib
 import pygame
 from pygame.typing import Point
 
@@ -43,6 +45,7 @@ pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
 res_list_x = [200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
 res_list_y = [200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+won_levels = {x:False for x in range(1,10)}
 
 #Gameplay
 surface_list:list[ScreenSurface] = []
@@ -75,8 +78,25 @@ class ScreenEnum(enum.Enum):
     LEVEL_SELECTOR = enum.auto()
     ESCAPE_MENU = enum.auto()
 
-
 current_screen = ScreenEnum.MAIN_MENU
+
+def load_wins():
+    SAVE_PATH = pathlib.Path("./save.json")
+    SAVE_PATH.touch()
+    with open(SAVE_PATH, "r", encoding="utf-8") as f:
+        if len(f.readlines(1)) == 0:
+            return
+        f.seek(0)
+        wins:dict = json.load(f)
+        print(wins)
+        for k,v in wins.items():
+            won_levels[int(k)] = v
+
+
+def save_wins():
+    SAVE_PATH = pathlib.Path("./save.json")
+    with open(SAVE_PATH, "w", encoding="utf-8") as f:
+        f.write(json.dumps(won_levels))
 
 def set_collider(ss:ScreenSurface):
     '''Sets the ss to a collider and a surface'''
@@ -239,6 +259,8 @@ class Player(ScreenSurface):
                     self.x_vel += strength*dx/dist
                     self.y_vel += strength*dy/dist
                     if black_hole.rect.colliderect(self.rect):
+                        won_levels[map_number] = True
+                        save_wins()
                         current_screen = ScreenEnum.MAIN_MENU
 
     def respawn(self):
@@ -385,7 +407,7 @@ while running:
             elif current_screen == ScreenEnum.LEVEL_SELECTOR:
                 if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
-                for i in range(1, 26):
+                for i in range(1, 10):
                     if button_pos_dict[str(i)].collidepoint(pygame.mouse.get_pos()):
                         load_map(i)
                         current_screen = ScreenEnum.GAME
@@ -539,12 +561,16 @@ while running:
                 player.first = True
                 pygame.display.flip()
         case ScreenEnum.LEVEL_SELECTOR:
+            load_wins()
             if not level_selector_loaded:
                 make_button(big_text, "LEVELS", (HORIZONTAL_SIZE/2, 15))
                 make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
-                for i in range(5):
-                    for j in range(5):
-                        make_button(big_text, f"{1+j*5+i}", ((HORIZONTAL_SIZE//7)*(1.5+i), (VERTICAL_SIZE//7)*(1.5+j)))
+                for i in range(3):
+                    for j in range(3):
+                        if won_levels[1+j*3+i]:
+                            make_button(big_text, f"{1+j*3+i}", ((HORIZONTAL_SIZE//5)*(1.5+i), (VERTICAL_SIZE//5)*(1.5+j)), (0, 255, 0))
+                        else:
+                            make_button(big_text, f"{1+j*3+i}", ((HORIZONTAL_SIZE//5)*(1.5+i), (VERTICAL_SIZE//5)*(1.5+j)))
                 level_selector_loaded = True
                 menu_loaded = False
                 escape_loaded = False
