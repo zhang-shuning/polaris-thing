@@ -149,6 +149,8 @@ class Player(ScreenSurface):
         self.grounded_timer:float = 0
         self.in_build:bool = True
         self.first:bool = True
+        self.bh_lim:int = 10
+        self.bh_cur:int = 0
 
     def check_x_collisions(self):
         #Check collisions, if collided, set x position to the x
@@ -202,13 +204,14 @@ class Player(ScreenSurface):
         for black_hole in black_hole_list:
             dx = black_hole.rect.centerx - self.x_pos
             dy = black_hole.rect.centery - self.y_pos
-            dist_sq = dx**2 + dy**2
-            dist = math.sqrt(dist_sq)
-            strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
-            self.x_vel += strength*dx/dist
-            self.y_vel += strength*dy/dist
-            if black_hole.rect.colliderect(self.rect):
-                self.respawn()
+            if dx <= 64 and dy <= 64:
+                dist_sq = dx**2 + dy**2
+                dist = math.sqrt(dist_sq)
+                strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
+                self.x_vel += strength*dx/dist
+                self.y_vel += strength*dy/dist
+                if black_hole.rect.colliderect(self.rect):
+                    self.respawn()
 
     def respawn(self):
         self.y_pos = self.res_y_pos
