@@ -253,26 +253,6 @@
         "assets/block1.png",
         2,
         [
-            416,
-            128,
-            32,
-            32
-        ]
-    ],
-    [
-        "assets/temphole.png",
-        3,
-        [
-            425,
-            107,
-            8,
-            8
-        ]
-    ],
-    [
-        "assets/block1.png",
-        2,
-        [
             96,
             352,
             32,
@@ -287,6 +267,86 @@
             352,
             32,
             32
+        ]
+    ],
+    [
+        "assets/temphole.png",
+        3,
+        [
+            247,
+            187,
+            8,
+            8
+        ]
+    ],
+    [
+        "assets/temphole.png",
+        3,
+        [
+            287,
+            189,
+            8,
+            8
+        ]
+    ],
+    [
+        "assets/whitehole.png",
+        4,
+        [
+            461,
+            234,
+            8,
+            8
+        ]
+    ],
+    [
+        "assets/temphole.png",
+        3,
+        [
+            399,
+            175,
+            8,
+            8
+        ]
+    ],
+    [
+        "assets/temphole.png",
+        3,
+        [
+            427,
+            150,
+            8,
+            8
+        ]
+    ],
+    [
+        "assets/temphole.png",
+        3,
+        [
+            460,
+            177,
+            8,
+            8
+        ]
+    ],
+    [
+        "assets/temphole.png",
+        3,
+        [
+            378,
+            82,
+            8,
+            8
+        ]
+    ],
+    [
+        "assets/temphole.png",
+        3,
+        [
+            511,
+            87,
+            8,
+            8
         ]
     ]
 ]

@@ -44,8 +44,8 @@ screen = pygame.display.set_mode((HORIZONTAL_SIZE, VERTICAL_SIZE),vsync=1,flags 
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 clock = pygame.time.Clock()
-res_list_x = [100,100,20,20,96,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
-res_list_y = [330,300,300,300,0,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_x = [100,100,20,20,96,32,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
+res_list_y = [330,300,300,300,0,VERTICAL_SIZE-64,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
 won_levels = {x:False for x in range(1,10)}
 
 #Gameplay
@@ -142,8 +142,12 @@ class ScreenSurface():
             set_collider(self)
         elif group == 3:
             set_black_hole(self)
+            if rect_offset == (0,0):
+                self.rect_offset=(12,12)
         elif group == 4:
             set_white_hole(self)
+            if rect_offset == (0,0):
+                self.rect_offset=(12,12)
 
     def draw(self):
         '''Draws onto the screen'''
@@ -244,7 +248,10 @@ class Player(ScreenSurface):
                 dist_sq = dx**2 + dy**2
                 dist = math.sqrt(dist_sq)
                 if dist < BLACK_HOLE_DIST:
-                    strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
+                    try:
+                        strength = min(BLACK_HOLE_STRENGTH/dist, MAX_BLACK_HOLE_ACCELERATION)
+                    except ZeroDivisionError:
+                        strength = MAX_BLACK_HOLE_ACCELERATION
                     self.x_vel += strength*dx/dist
                     self.y_vel += strength*dy/dist
                     if black_hole.rect.colliderect(self.rect):
