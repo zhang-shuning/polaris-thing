@@ -219,7 +219,7 @@ class Player(ScreenSurface):
 
 def create_black_hole(coordinates:tuple[int, int], show_hitbox = False):
     black_hole_test = ScreenSurface(pygame.image.load("assets/temphole.png"),
-                                     rect=pygame.Rect((coordinates), (8, 8)),
+                                     rect=pygame.Rect((coordinates), (8, 8)), map="assets/temphole.png",
                                      rect_offset=(12,12), show_hitbox=show_hitbox, group=3)
 
 def load_map(number):
@@ -232,7 +232,7 @@ def load_map(number):
     try:
         if maps is not None:
             for i in maps:
-                set_collider(ScreenSurface(pygame.image.load(i[0]), rect = pygame.Rect(i[1])))
+                ScreenSurface(pygame.image.load(i[0]), group=i[1], rect = pygame.Rect(i[2]), map=i[0])
         else:
             print("That map does not exist")
     except ValueError:
@@ -361,7 +361,7 @@ while running:
             if event.key == pygame.K_b:
                 player.in_build = not player.in_build
             if event.key == pygame.K_s and current_screen == ScreenEnum.GAME and event.mod & pygame.KMOD_CTRL:
-                scripts.map_save.write_map(surface_list, map_number)
+                scripts.map_save.write_map([(surface.map, surface.group, tuple(surface.rect)) for surface in surface_list], map_number)
 
 
     keys = pygame.key.get_pressed()
