@@ -2,7 +2,7 @@
 
 ### This is a 2d platformer, with black holes that pull you towards them. It's pretty self explanatory IMO.
 
-### The controls are (also found in game)
+### Controls: (also found in game)
 
 Jump: up/C
 
