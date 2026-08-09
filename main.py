@@ -49,8 +49,8 @@ collider_list:list[ScreenSurface] = []
 black_hole_list:list[ScreenSurface] = []
 screen_offset:int = 0
 screen_end:int = HORIZONTAL_SIZE
-res_x_list = []
-res_y_list = []
+res_x_list = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+res_y_list = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 #Menus
 menu_loaded:bool = False
@@ -266,6 +266,11 @@ while running:
                 if not any(rect == collider.rect for collider in collider_list):
                     set_collider(ScreenSurface(surface=pygame.image.load("assets/block1.png"),
                                             rect=rect, map = "assets/block1.png"))
+            elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
+                rect = pygame.Rect(pygame.mouse.get_pos(), (32,32))
+                ScreenSurface(pygame.image.load("assets/temphole.png"),
+                               rect=rect, rect_offset=(8,8), show_hitbox=True)
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE and ScreenEnum.GAME:
                 escape_loaded = False
