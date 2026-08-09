@@ -33,7 +33,7 @@ HORIZONTAL_AIR_RESISTANCE = .95 # Coefficient on x axis air resistance
 VERTICAL_AIR_RESISTANCE = .95 # Coefficient on y axis air resistance
 WALL_HORIZONTAL_SPEED_PENELTY = .95 #Speed penelety for touching a wall
 
-BLACK_HOLE_STRENGTH = .5
+BLACK_HOLE_STRENGTH = 25
 
 running = True
 pygame.init()
@@ -186,10 +186,17 @@ class Player(ScreenSurface):
         self.check_y_collisions()
 
     def handle_black_hole(self):
-        #Find euclidean distance to black holes
+        #Vectors because surely that will help
         for black_hole in black_hole_list:
-            self.x_vel += BLACK_HOLE_STRENGTH/math.copysign((black_hole.rect.x - self.x_pos)**2, + black_hole.rect.x - self.x_pos)
-            self.y_vel += BLACK_HOLE_STRENGTH/math.copysign((black_hole.rect.y - self.y_pos)**2, + black_hole.rect.y - self.y_pos)
+            vec = math.sqrt((black_hole.rect.x - self.x_pos)**2 + (black_hole.rect.y - self.y_pos)**2)
+            theta = math.atan2(black_hole.rect.x - self.x_pos, black_hole.rect.y - self.y_pos)
+            distx = vec*math.sin(math.atan2(black_hole.rect.x - self.x_pos, black_hole.rect.y - self.y_pos))
+            disty = vec*math.cos(math.atan2(black_hole.rect.x - self.x_pos, black_hole.rect.y - self.y_pos))
+            strength = BLACK_HOLE_STRENGTH/vec
+            print(distx, disty)
+            print(strength/(distx*math.sin(theta)), strength/(disty*math.cos(theta)))
+            self.x_vel += strength/(distx*math.sin(theta))
+            self.y_vel -= strength/(disty*math.cos(theta))
 
 def load_map(number):
     collider_list.clear()
@@ -229,7 +236,7 @@ while running:
             elif current_screen == ScreenEnum.LEVEL_SELECTOR:
                 if button_pos_dict[RETURN_MENU].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.MAIN_MENU
-                for i in range(25):
+                for i in range(1, 26):
                     if button_pos_dict[str(i)].collidepoint(pygame.mouse.get_pos()):
                         load_map(i)
                         current_screen = ScreenEnum.GAME
