@@ -234,6 +234,8 @@ def load_map(number):
     player.res_x_pos = res_list_x[number-1]
     player.res_y_pos = res_list_y[number-1]
     maps = scripts.map_save.read_map(number)
+    player.x_pos = player.res_x_pos
+    player.y_pos = player.res_y_pos
     try:
         if maps is not None:
             for i in maps:
@@ -247,8 +249,9 @@ def load_map(number):
 
 
 player = Player(surface=pygame.image.load("assets/player.png"),
-                rect=pygame.Rect((0,0), (28, 28)), rect_offset=(2, 2))
-player.rect = pygame.Rect((player.res_x_pos,player.res_y_pos),(28,28))
+                rect=pygame.Rect((0, 0), (28, 28)), rect_offset=(2, 2))
+player.x_pos = player.res_x_pos
+player.y_pos = player.res_y_pos
 
 tile_size = (32,32)
 def connect_textures():
