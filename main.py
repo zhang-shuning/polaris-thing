@@ -11,7 +11,6 @@ import scripts.map_save
 HORIZONTAL_SIZE = 640
 VERTICAL_SIZE = 360
 
-START_GAME_NAME = "Start Game"
 RESUME_GAME = "Resume Game"
 LEVEL_SELECTOR_NAME = "Level\n Selector"
 RETURN_MENU = "Back To \nMain Menu"
@@ -319,9 +318,7 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if current_screen == ScreenEnum.MAIN_MENU:
-                if button_pos_dict[START_GAME_NAME].collidepoint(pygame.mouse.get_pos()):
-                    current_screen = ScreenEnum.GAME
-                elif button_pos_dict[LEVEL_SELECTOR_NAME].collidepoint(pygame.mouse.get_pos()):
+                if button_pos_dict[LEVEL_SELECTOR_NAME].collidepoint(pygame.mouse.get_pos()):
                     current_screen = ScreenEnum.LEVEL_SELECTOR
                 elif button_pos_dict[QUIT_TEXT].collidepoint(pygame.mouse.get_pos()):
                     running = False
@@ -351,11 +348,10 @@ while running:
                                             rect=rect, map = "assets/block1.png", group=2)
                     temp()
             elif event.button == 1 and not player.in_build and current_screen == ScreenEnum.GAME:
-                rect = pygame.Rect(pygame.mouse.get_pos(), (32,32))
-                pass
+                create_black_hole(pygame.mouse.get_pos())
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE and ScreenEnum.GAME:
+            if event.key == pygame.K_ESCAPE and current_screen == ScreenEnum.GAME:
                 escape_loaded = False
                 current_screen = ScreenEnum.ESCAPE_MENU
             if event.key == pygame.K_b:
@@ -428,7 +424,6 @@ while running:
             #Main menu
             if not menu_loaded:
                 pygame.mouse.set_visible(True)
-                make_button(big_text, START_GAME_NAME, (HORIZONTAL_SIZE/10, VERTICAL_SIZE/10))
                 make_button(big_text, LEVEL_SELECTOR_NAME, (HORIZONTAL_SIZE/2, VERTICAL_SIZE/2))
                 make_button(big_text, QUIT_TEXT, (HORIZONTAL_SIZE - 80, VERTICAL_SIZE - 20))
                 menu_loaded = True
