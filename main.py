@@ -544,7 +544,7 @@ while running:
                 make_button(big_text, RETURN_MENU, (HORIZONTAL_SIZE/10+20, VERTICAL_SIZE-25))
                 for i in range(5):
                     for j in range(5):
-                        make_button(big_text, f"{1+i*5+j}", ((HORIZONTAL_SIZE//7)*(1.5+i), (VERTICAL_SIZE//7)*(1.5+j)))
+                        make_button(big_text, f"{1+j*5+i}", ((HORIZONTAL_SIZE//7)*(1.5+i), (VERTICAL_SIZE//7)*(1.5+j)))
                 level_selector_loaded = True
                 menu_loaded = False
                 escape_loaded = False
